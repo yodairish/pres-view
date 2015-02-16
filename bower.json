@@ -1,0 +1,18 @@
+{
+  "name": "pres-view",
+  "version": "0.1.0",
+  "authors": [
+    "yodairish <yodairish@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "__test__"
+  ],
+  "dependencies": {
+    "es6-shim": "~0.25.0"
+  }
+}
