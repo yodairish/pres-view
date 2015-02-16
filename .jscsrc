@@ -1,6 +1,7 @@
 {
   "preset": "airbnb",
   "esnext": true,
+  "esprima": "esprima-fb",
   
   "disallowMultipleVarDecl": null,
   "requireMultipleVarDecl": true,

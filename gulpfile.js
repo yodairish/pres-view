@@ -10,6 +10,7 @@ var gulp = require('gulp'),
     csswring = require('csswring'),
     postcss = require('gulp-postcss'),
     // js
+    react = require('gulp-react'),
     sass = require('gulp-sass'),
     jshint = require('gulp-jshint'),
     jscs = require('gulp-jscs'),
@@ -87,10 +88,11 @@ gulp.task('jslint', function() {
   }
 
   return gulp.src(files)
+    .pipe(jscs())
+    .pipe(react())
     .pipe(jshint.extract())
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
-    .pipe(jscs())
     .pipe(jshint.reporter('fail'));
 });
 
