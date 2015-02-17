@@ -70,5 +70,8 @@
   "wsh"           : false,
   "yui"           : false,
 
-  "globals"       : {}
+  "globals"       : {
+    "jest": false,
+    "expect": false
+  }
 }

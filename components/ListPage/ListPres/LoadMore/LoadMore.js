@@ -1,8 +1,8 @@
 'use strict';
 
 import React from 'react';
-import PresListStore from '../../../js/stores/presListStore.js';
-import PresListActions from '../../../js/actions/presListActions.js';
+import PresListStore from '../../../../js/stores/PresListStore.js';
+import PresListActions from '../../../../js/actions/PresListActions.js';
 
 export default React.createClass({
   /**
@@ -40,15 +40,15 @@ export default React.createClass({
           hidden: this.state.loading
         }),
         loaderClasses = cx({
-          'loadMore-loader': true,
+          'loadMore-spinner': true,
           hidden: !this.state.loading
         });
     
     return (
-      <div class="loadMore">
-        <button class={buttonClasses}
+      <div className="loadMore">
+        <button className={buttonClasses}
                 onClick={this.onClick}>Load More</button>
-        <span class={loaderClasses}></span>
+        <span className={loaderClasses}></span>
       </div>
     );
   },
