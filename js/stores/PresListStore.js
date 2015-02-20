@@ -3,6 +3,8 @@
 import EventEmmiter from 'events';
 
 var PresListStore = Object.assign({}, EventEmmiter.prototype, {
+  favorites: false,
+  
   /**
    * Add new listener for loading new part of presentations list
    */
@@ -22,6 +24,14 @@ var PresListStore = Object.assign({}, EventEmmiter.prototype, {
    */
   getAll() {
     return [];
+  },
+  
+  /**
+   * Return current status of active favorites list
+   * @returns {boolean}
+   */
+  isFavorites() {
+    return this.favorites;
   }
 });
 

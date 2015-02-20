@@ -48,11 +48,19 @@ export default React.createClass({
       return <ListPresItem id={item.id}
                            title={item.title}
                            img={item.img} />;
-    });
+    }),
+        emptyMessage = <p className="listPres-empty">
+                          No any presentation
+                        </p>;
+                        
+    if (items.length) {
+      emptyMessage = '';
+    }
     
     return (
       <div className="listPres">
         {items}
+        {emptyMessage}
         <LoadMore />
       </div>
     );

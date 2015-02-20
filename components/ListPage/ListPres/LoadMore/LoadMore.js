@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React from 'react/addons';
 import PresListStore from '../../../../js/stores/PresListStore.js';
 import PresListActions from '../../../../js/actions/PresListActions.js';
 

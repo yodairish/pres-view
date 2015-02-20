@@ -6,5 +6,13 @@ export default {
    */
   loadMore() {
     
+  },
+  
+  /**
+   * Create action for showing only favorites
+   * @param {boolean} active
+   */
+  showFavorites(active) {
+    return active;
   }
 };

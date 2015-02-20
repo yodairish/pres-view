@@ -1,6 +1,8 @@
 'use strict';
 
 import React from 'react';
+import ListPres from './ListPres/ListPres.js';
+import Menu from './Menu/Menu.js';
 
 export default React.createClass({
   /**
@@ -8,7 +10,10 @@ export default React.createClass({
    */
   render() {
     return (
-      <div className="listPage"></div>
+      <div className="listPage">
+        <Menu />
+        <ListPres />
+      </div>
     );
   }
 });
