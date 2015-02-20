@@ -31,7 +31,7 @@ export default React.createClass({
   },
   
   /**
-   * Renderig component html
+   * Rendering component to html
    */
   render() {
     var cx = React.addons.classSet,

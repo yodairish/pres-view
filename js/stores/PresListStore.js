@@ -15,6 +15,13 @@ var PresListStore = Object.assign({}, EventEmmiter.prototype, {
    */
   removeNextPartListener() {
     
+  },
+  
+  /**
+   * Return all available presentations
+   */
+  getAll() {
+    return [];
   }
 });
 

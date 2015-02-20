@@ -21,9 +21,7 @@ var gulp = require('gulp'),
     COMPONENT_PATH = 'components',
     PUBLIC_CSS = 'public/css',
     PUBLIC_JS = 'public/js',
-    JS_ENTRY_POINTS = [
-      JS_PATH + '/main.js'
-    ];
+    JS_ENTRY_POINT = JS_PATH + '/main.js';
 
 /**
  * Linting SCSS files
@@ -100,8 +98,20 @@ gulp.task('jslint', function() {
  * Processing JS files
  */
 gulp.task('js', ['jslint'], function() {
-  return gulp.src(JS_ENTRY_POINTS)
-    .pipe(webpack())
+  var watchOn = (process.argv.indexOf('--watch') !== -1);
+  
+  return gulp.src(JS_ENTRY_POINT)
+    .pipe(webpack({
+      watch: watchOn,
+      output: {
+        filename: 'bundle.js'
+      },
+      module: {
+        loaders: [
+          { test: /\.js/, loader: 'babel' }
+        ]
+      }
+    }))
     .pipe(gulp.dest(PUBLIC_JS));
 });
 
