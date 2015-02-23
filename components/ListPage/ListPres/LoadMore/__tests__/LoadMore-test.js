@@ -2,7 +2,6 @@
 
 jest.dontMock('../LoadMore.js');
 
-import 'es6-shim';
 import React from 'react/addons';
 import LoadMore from '../LoadMore.js';
 import PresListStore from '../../../../../js/stores/PresListStore.js';

@@ -45,14 +45,15 @@ export default React.createClass({
    */
   render() {
     var items = this.state.items.map((item) => {
-      return <ListPresItem id={item.id}
+      return <ListPresItem key={item.id}
+                           id={item.id}
                            title={item.title}
                            img={item.img} />;
     }),
         emptyMessage = <p className="listPres-empty">
                           No any presentation
                         </p>;
-                        
+
     if (items.length) {
       emptyMessage = '';
     }

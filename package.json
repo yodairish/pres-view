@@ -38,9 +38,16 @@
     "webpack": "^1.5.3"
   },
   "jest": {
+    "setupEnvScriptFile": "<rootDir>/node_modules/es6-shim/es6-shim.js",
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
-    "testPathDirs": ["<rootDir>/components", "<rootDir>/js"],
-    "unmockedModulePathPatterns": ["react", "es6-shim"]
+    "testPathDirs": [
+      "<rootDir>/components",
+      "<rootDir>/js"
+    ],
+    "unmockedModulePathPatterns": [
+      "react",
+      "es6-shim"
+    ]
   },
   "license": "MIT",
   "homepage": "https://github.com/yodairish/pres-view"
