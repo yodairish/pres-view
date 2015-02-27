@@ -17,24 +17,24 @@ export default React.createClass({
   
   /**
    * When component into the DOM
-   * Start listening getting next part items of list
+   * Start listening updating list of items
    */
   componentDidMount() {
-    PresListStore.addNextPartListener(this.onNextPart);
+    PresListStore.addChangeListener(this.onChange);
   },
   
   /**
    * When component remove from DOM
-   * Stop listening getting next part items of list
+   * Stop listening updating list of items
    */
   componentWillUnmount() {
-    PresListStore.removeNextPartListener(this.onNextPart);
+    PresListStore.removeChangeListener(this.onChange);
   },
   
   /**
-   * After loading next part update items list
+   * After changing presentation list update items list
    */
-  onNextPart() {
+  onChange() {
     this.setState({
       items: PresListStore.getAll()
     });

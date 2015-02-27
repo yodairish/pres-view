@@ -86,12 +86,12 @@ gulp.task('jslint', function() {
   }
 
   return gulp.src(files)
-    .pipe(jscs())
-    .pipe(react())
-    .pipe(jshint.extract())
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'))
-    .pipe(jshint.reporter('fail'));
+    .pipe(jscs()).on('error', errorHandler)
+    .pipe(react()).on('error', errorHandler)
+    .pipe(jshint.extract()).on('error', errorHandler)
+    .pipe(jshint()).on('error', errorHandler)
+    .pipe(jshint.reporter('default')).on('error', errorHandler)
+    .pipe(jshint.reporter('fail')).on('error', errorHandler);
 });
 
 /**
@@ -116,3 +116,9 @@ gulp.task('js', ['jslint'], function() {
 });
 
 gulp.task('default', ['js', 'css']);
+
+// Handle the error
+function errorHandler (error) {
+  console.log(error.toString());
+  this.emit('end');
+}

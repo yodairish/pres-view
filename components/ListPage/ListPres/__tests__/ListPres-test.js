@@ -24,7 +24,9 @@ describe('List Pres component', () => {
     PresListStore.getAll.mockReturnValue(list);
     PresListStore.addNextPartListener.mockClear();
     
-    listPres = TestUtils.renderIntoDocument(<ListPres />);
+    listPres = TestUtils.renderIntoDocument(
+      <ListPres />
+    );
   });
   
   it('Initialize with all available items', () => {
@@ -65,7 +67,7 @@ describe('List Pres component', () => {
     PresListStore.getAll.mockReturnValue([]);
     PresListStore.addNextPartListener.mock.calls[0][0]();
     
-    var message = TestUtils.scryRenderedDOMComponentsWithClass(
+    message = TestUtils.scryRenderedDOMComponentsWithClass(
       listPres,
       'listPres-empty'
     );

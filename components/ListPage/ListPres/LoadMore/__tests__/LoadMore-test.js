@@ -15,7 +15,7 @@ describe('LoadMore Component', () => {
       spinner;
       
   beforeEach(() => {
-    PresListStore.addNextPartListener.mockClear();
+    PresListStore.addChangeListener.mockClear();
     PresListActions.loadMore.mockClear();
     
     loadMore = TestUtils.renderIntoDocument(
@@ -50,7 +50,7 @@ describe('LoadMore Component', () => {
     
     expect(loadMore.state.loading).toBeTruthy();
     
-    PresListStore.addNextPartListener.mock.calls[0][0]();
+    PresListStore.addChangeListener.mock.calls[0][0]();
     
     expect(loadMore.state.loading).toBeFalsy();
   });

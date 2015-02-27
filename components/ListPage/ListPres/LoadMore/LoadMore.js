@@ -19,7 +19,7 @@ export default React.createClass({
    * Start listening getting next part items of list
    */
   componentDidMount() {
-    PresListStore.addNextPartListener(this.onNextPart);
+    PresListStore.addChangeListener(this.onNextPart);
   },
   
   /**
@@ -27,7 +27,7 @@ export default React.createClass({
    * Stop listening getting next part items of list
    */
   componentWillUnmount() {
-    PresListStore.removeNextPartListener(this.onNextPart);
+    PresListStore.removeChangeListener(this.onNextPart);
   },
   
   /**

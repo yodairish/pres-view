@@ -33,9 +33,11 @@
     "jest-cli": "^0.2.2",
     "jscs": "^1.11.3",
     "jscs-jsdoc": "^0.4.4",
+    "keymirror": "^0.1.1",
     "merge-stream": "^0.1.7",
     "react": "^0.12.2",
-    "webpack": "^1.5.3"
+    "webpack": "^1.5.3",
+    "whatwg-fetch": "^0.7.0"
   },
   "jest": {
     "setupEnvScriptFile": "<rootDir>/node_modules/es6-shim/es6-shim.js",
@@ -46,7 +48,9 @@
     ],
     "unmockedModulePathPatterns": [
       "react",
-      "es6-shim"
+      "es6-shim",
+      "keymirror",
+      "events"
     ]
   },
   "license": "MIT",
