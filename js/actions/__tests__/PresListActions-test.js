@@ -37,4 +37,16 @@ describe('Action creator for presentations list', () => {
     expect(action.type).toBe(ACTIONS_PRES_LIST.FAVORITES);
     expect(action.active).toBeFalsy();
   });
+  
+  it('Toggle favorite status for item', () => {
+    var id = 123,
+        action;
+    
+    PresListActions.toggleFavoriteStatus(id);
+    
+    action = appDispatcher.dispatch.mock.calls[0][0];
+    
+    expect(action.type).toBe(ACTIONS_PRES_LIST.TOGGLE_FAVORITE);
+    expect(action.id).toBe(id);
+  });
 });

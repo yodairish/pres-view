@@ -69,4 +69,25 @@ describe('Store for presentations list', () => {
 
     expect(loader.getNextItems.mock.calls[0][0]).toBe(1);
   });
+  
+  it('Toggle favorite status for item', () => {
+    var id = 123,
+        items;
+    
+    callback({
+      type: ACTIONS_PRES_LIST.GET_MEW_ITEMS,
+      items: [{
+        id: id
+      }]
+    });
+    
+    callback({
+      type: ACTIONS_PRES_LIST.TOGGLE_FAVORITE,
+      id: id
+    });
+    
+    items = PresListStore.getAll();
+
+    expect(items[0].favorite).toBeTruthy();
+  });
 });

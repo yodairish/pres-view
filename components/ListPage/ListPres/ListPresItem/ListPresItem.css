@@ -1,4 +1,6 @@
 .listPresItem {
+  position: relative;
+
   max-width: 320px;
   min-height: 240px;
   margin-bottom: 15px;
@@ -34,4 +36,14 @@
 
   line-height: 40px;
   text-align: center;
+}
+
+.listPresItem-favorite {
+  position: absolute;
+  z-index: 200;
+  top: 10px;
+  right: 10px;
+
+  width: 20px;
+  height: 20px;
 }

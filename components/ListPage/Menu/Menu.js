@@ -27,7 +27,7 @@ export default React.createClass({
     return (
       <div className="menu">
         <span className={favoritesClasses}
-                onClick={this.showFavorites}>
+              onClick={this.showFavorites}>
           <span className="favorites-star"></span>
           <span className="favorites-star"></span>
         </span>

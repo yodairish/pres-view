@@ -44,5 +44,16 @@ export default {
       type: ACTIONS_PRES_LIST.GET_MEW_ITEMS_ERROR,
       error: error
     });
+  },
+  
+  /**
+   * Toggle favorite status for item
+   * @param {number} id
+   */
+  toggleFavoriteStatus(id) {
+    appDispatcher.dispatch({
+      type: ACTIONS_PRES_LIST.TOGGLE_FAVORITE,
+      id: id
+    });
   }
 };

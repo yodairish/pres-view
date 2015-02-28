@@ -20,6 +20,16 @@ export default {
       .catch((error) => {
         PresListActions.getNewItemsError(error);
       });
+  },
+  
+  /**
+   * Toggle favorite status for item
+   * @param {number} id
+   */
+  toggleItemFavorite(id) {
+    // here should be request to server
+    
+    console.log('Toggle favorire: ', id);
   }
 };
 

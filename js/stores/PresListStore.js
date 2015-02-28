@@ -70,7 +70,6 @@ PresListStore.dispatchToken = appDispatcher.register((action) => {
   switch (action.type) {
     case ACTIONS_PRES_LIST.LOAD_MORE: {
       loader.getNextItems(PresListStore.getCount());
-      console.dir(loader.getNextItems);
       break;
     }
     case ACTIONS_PRES_LIST.GET_MEW_ITEMS: {
@@ -85,7 +84,45 @@ PresListStore.dispatchToken = appDispatcher.register((action) => {
       PresListStore.emitChange();
       break;
     }
+    case ACTIONS_PRES_LIST.TOGGLE_FAVORITE: {
+      toggleItemFavorite(action.id);
+      
+      PresListStore.emitChange();
+      break;
+    }
   }
 });
+
+/**
+ * Toggle favorite status for item
+ * @param {number} id
+ */
+function toggleItemFavorite(id) {
+  var index = findItemById(id);
+  
+  if (index >= 0) {
+    presentations[index].favorite = !presentations[index].favorite;
+  }
+}
+
+/**
+ * Find item index by id
+ * @param {number} id
+ * @returns {number}
+ */
+function findItemById(id) {
+  var index = -1,
+      length = presentations.length,
+      i;
+  
+  for (i = 0; i < length; i++) {
+    if (presentations[i].id === id) {
+      index = i;
+      break;
+    }
+  }
+  
+  return index;
+}
 
 export default PresListStore;

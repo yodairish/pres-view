@@ -12,7 +12,8 @@
   {
     "id": 17,
     "img": "./pres/images/pres.jpg",
-    "title": "some title 99"
+    "title": "some title 99",
+    "favorite": true
   },
   {
     "id": 18,

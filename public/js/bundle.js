@@ -572,7 +572,8 @@
 	      return React.createElement(ListPresItem, { key: item.id,
 	        id: item.id,
 	        title: item.title,
-	        img: item.img });
+	        img: item.img,
+	        favorite: item.favorite });
 	    }),
 	        emptyMessage = React.createElement(
 	      "p",
@@ -685,9 +686,9 @@
 	var ReactContext = __webpack_require__(18);
 	var ReactCurrentOwner = __webpack_require__(19);
 	var ReactElement = __webpack_require__(20);
-	var ReactElementValidator = __webpack_require__(23);
-	var ReactDOM = __webpack_require__(21);
-	var ReactDOMComponent = __webpack_require__(22);
+	var ReactElementValidator = __webpack_require__(21);
+	var ReactDOM = __webpack_require__(22);
+	var ReactDOMComponent = __webpack_require__(23);
 	var ReactDefaultInjection = __webpack_require__(24);
 	var ReactInstanceHandles = __webpack_require__(25);
 	var ReactLegacyElement = __webpack_require__(26);
@@ -885,7 +886,6 @@
 	    case ACTIONS_PRES_LIST.LOAD_MORE:
 	      {
 	        loader.getNextItems(PresListStore.getCount());
-	        console.dir(loader.getNextItems);
 	        break;
 	      }
 	    case ACTIONS_PRES_LIST.GET_MEW_ITEMS:
@@ -902,8 +902,47 @@
 	        PresListStore.emitChange();
 	        break;
 	      }
+	    case ACTIONS_PRES_LIST.TOGGLE_FAVORITE:
+	      {
+	        toggleItemFavorite(action.id);
+
+	        PresListStore.emitChange();
+	        break;
+	      }
 	  }
 	});
+
+	/**
+	 * Toggle favorite status for item
+	 * @param {number} id
+	 */
+	function toggleItemFavorite(id) {
+	  var index = findItemById(id);
+
+	  if (index >= 0) {
+	    presentations[index].favorite = !presentations[index].favorite;
+	  }
+	}
+
+	/**
+	 * Find item index by id
+	 * @param {number} id
+	 * @returns {number}
+	 */
+	function findItemById(id) {
+	  var index = -1,
+	      length = presentations.length,
+	      i;
+
+	  for (i = 0; i < length; i++) {
+	    if (presentations[i].id === id) {
+	      index = i;
+	      break;
+	    }
+	  }
+
+	  return index;
+	}
 
 	module.exports = PresListStore;
 
@@ -959,6 +998,17 @@
 	      type: ACTIONS_PRES_LIST.GET_MEW_ITEMS_ERROR,
 	      error: error
 	    });
+	  },
+
+	  /**
+	   * Toggle favorite status for item
+	   * @param {number} id
+	   */
+	  toggleFavoriteStatus: function toggleFavoriteStatus(id) {
+	    appDispatcher.dispatch({
+	      type: ACTIONS_PRES_LIST.TOGGLE_FAVORITE,
+	      id: id
+	    });
 	  }
 	};
 
@@ -970,7 +1020,9 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var React = _interopRequire(__webpack_require__(3));
+	var React = _interopRequire(__webpack_require__(11));
+
+	var PresListActions = _interopRequire(__webpack_require__(8));
 
 	var ViewPresActions = _interopRequire(__webpack_require__(12));
 
@@ -982,7 +1034,8 @@
 	  propTypes: {
 	    id: React.PropTypes.number.isRequired,
 	    title: React.PropTypes.string,
-	    img: React.PropTypes.string
+	    img: React.PropTypes.string,
+	    favorite: React.PropTypes.bool
 	  },
 
 	  /**
@@ -991,7 +1044,8 @@
 	  getDefaultProps: function getDefaultProps() {
 	    return {
 	      title: "",
-	      img: ""
+	      img: "",
+	      favorite: false
 	    };
 	  },
 
@@ -999,10 +1053,23 @@
 	   * Rendering component to html
 	   */
 	  render: function render() {
+	    var cx = React.addons.classSet,
+	        favoritesClasses = cx({
+	      "listPresItem-favorite": true,
+	      "favorites--active": this.props.favorite
+	    });
+
 	    return React.createElement(
 	      "div",
 	      { className: "listPresItem",
 	        onClick: this.onClick },
+	      React.createElement(
+	        "span",
+	        { className: favoritesClasses,
+	          onClick: this.addToFavorites },
+	        React.createElement("span", { className: "favorites-star" }),
+	        React.createElement("span", { className: "favorites-star" })
+	      ),
 	      React.createElement(
 	        "div",
 	        { className: "listPresItem-img" },
@@ -1022,6 +1089,13 @@
 	   */
 	  onClick: function onClick() {
 	    ViewPresActions.open(this.props.id);
+	  },
+
+	  /**
+	   * Add/remove current presentation to favorites
+	   */
+	  addToFavorites: function addToFavorites() {
+	    PresListActions.toggleFavoriteStatus(this.props.id);
 	  }
 	});
 
@@ -2076,7 +2150,7 @@
 	var ReactContext = __webpack_require__(18);
 	var ReactCurrentOwner = __webpack_require__(19);
 	var ReactElement = __webpack_require__(20);
-	var ReactElementValidator = __webpack_require__(23);
+	var ReactElementValidator = __webpack_require__(21);
 	var ReactEmptyComponent = __webpack_require__(54);
 	var ReactErrorUtils = __webpack_require__(55);
 	var ReactLegacyElement = __webpack_require__(26);
@@ -3558,6 +3632,257 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactElementValidator
+	 */
+
+	/**
+	 * ReactElementValidator provides a wrapper around a element factory
+	 * which validates the props passed to the element. This is intended to be
+	 * used only in DEV and could be replaced by a static type checker for languages
+	 * that support it.
+	 */
+
+	"use strict";
+
+	var ReactElement = __webpack_require__(20);
+	var ReactPropTypeLocations = __webpack_require__(57);
+	var ReactCurrentOwner = __webpack_require__(19);
+
+	var monitorCodeUse = __webpack_require__(61);
+	var warning = __webpack_require__(46);
+
+	/**
+	 * Warn if there's no key explicitly set on dynamic arrays of children or
+	 * object keys are not valid. This allows us to keep track of children between
+	 * updates.
+	 */
+	var ownerHasKeyUseWarning = {
+	  react_key_warning: {},
+	  react_numeric_key_warning: {}
+	};
+	var ownerHasMonitoredObjectMap = {};
+
+	var loggedTypeFailures = {};
+
+	var NUMERIC_PROPERTY_REGEX = /^\d+$/;
+
+	/**
+	 * Gets the current owner's displayName for use in warnings.
+	 *
+	 * @internal
+	 * @return {?string} Display name or undefined
+	 */
+	function getCurrentOwnerDisplayName() {
+	  var current = ReactCurrentOwner.current;
+	  return current && current.constructor.displayName || undefined;
+	}
+
+	/**
+	 * Warn if the component doesn't have an explicit key assigned to it.
+	 * This component is in an array. The array could grow and shrink or be
+	 * reordered. All children that haven't already been validated are required to
+	 * have a "key" property assigned to it.
+	 *
+	 * @internal
+	 * @param {ReactComponent} component Component that requires a key.
+	 * @param {*} parentType component's parent's type.
+	 */
+	function validateExplicitKey(component, parentType) {
+	  if (component._store.validated || component.key != null) {
+	    return;
+	  }
+	  component._store.validated = true;
+
+	  warnAndMonitorForKeyUse("react_key_warning", "Each child in an array should have a unique \"key\" prop.", component, parentType);
+	}
+
+	/**
+	 * Warn if the key is being defined as an object property but has an incorrect
+	 * value.
+	 *
+	 * @internal
+	 * @param {string} name Property name of the key.
+	 * @param {ReactComponent} component Component that requires a key.
+	 * @param {*} parentType component's parent's type.
+	 */
+	function validatePropertyKey(name, component, parentType) {
+	  if (!NUMERIC_PROPERTY_REGEX.test(name)) {
+	    return;
+	  }
+	  warnAndMonitorForKeyUse("react_numeric_key_warning", "Child objects should have non-numeric keys so ordering is preserved.", component, parentType);
+	}
+
+	/**
+	 * Shared warning and monitoring code for the key warnings.
+	 *
+	 * @internal
+	 * @param {string} warningID The id used when logging.
+	 * @param {string} message The base warning that gets output.
+	 * @param {ReactComponent} component Component that requires a key.
+	 * @param {*} parentType component's parent's type.
+	 */
+	function warnAndMonitorForKeyUse(warningID, message, component, parentType) {
+	  var ownerName = getCurrentOwnerDisplayName();
+	  var parentName = parentType.displayName;
+
+	  var useName = ownerName || parentName;
+	  var memoizer = ownerHasKeyUseWarning[warningID];
+	  if (memoizer.hasOwnProperty(useName)) {
+	    return;
+	  }
+	  memoizer[useName] = true;
+
+	  message += ownerName ? " Check the render method of " + ownerName + "." : " Check the renderComponent call using <" + parentName + ">.";
+
+	  // Usually the current owner is the offender, but if it accepts children as a
+	  // property, it may be the creator of the child that's responsible for
+	  // assigning it a key.
+	  var childOwnerName = null;
+	  if (component._owner && component._owner !== ReactCurrentOwner.current) {
+	    // Name of the component that originally created this child.
+	    childOwnerName = component._owner.constructor.displayName;
+
+	    message += " It was passed a child from " + childOwnerName + ".";
+	  }
+
+	  message += " See http://fb.me/react-warning-keys for more information.";
+	  monitorCodeUse(warningID, {
+	    component: useName,
+	    componentOwner: childOwnerName
+	  });
+	  console.warn(message);
+	}
+
+	/**
+	 * Log that we're using an object map. We're considering deprecating this
+	 * feature and replace it with proper Map and ImmutableMap data structures.
+	 *
+	 * @internal
+	 */
+	function monitorUseOfObjectMap() {
+	  var currentName = getCurrentOwnerDisplayName() || "";
+	  if (ownerHasMonitoredObjectMap.hasOwnProperty(currentName)) {
+	    return;
+	  }
+	  ownerHasMonitoredObjectMap[currentName] = true;
+	  monitorCodeUse("react_object_map_children");
+	}
+
+	/**
+	 * Ensure that every component either is passed in a static location, in an
+	 * array with an explicit keys property defined, or in an object literal
+	 * with valid key property.
+	 *
+	 * @internal
+	 * @param {*} component Statically passed child of any type.
+	 * @param {*} parentType component's parent's type.
+	 * @return {boolean}
+	 */
+	function validateChildKeys(component, parentType) {
+	  if (Array.isArray(component)) {
+	    for (var i = 0; i < component.length; i++) {
+	      var child = component[i];
+	      if (ReactElement.isValidElement(child)) {
+	        validateExplicitKey(child, parentType);
+	      }
+	    }
+	  } else if (ReactElement.isValidElement(component)) {
+	    // This component was passed in a valid location.
+	    component._store.validated = true;
+	  } else if (component && typeof component === "object") {
+	    monitorUseOfObjectMap();
+	    for (var name in component) {
+	      validatePropertyKey(name, component[name], parentType);
+	    }
+	  }
+	}
+
+	/**
+	 * Assert that the props are valid
+	 *
+	 * @param {string} componentName Name of the component for error messages.
+	 * @param {object} propTypes Map of prop name to a ReactPropType
+	 * @param {object} props
+	 * @param {string} location e.g. "prop", "context", "child context"
+	 * @private
+	 */
+	function checkPropTypes(componentName, propTypes, props, location) {
+	  for (var propName in propTypes) {
+	    if (propTypes.hasOwnProperty(propName)) {
+	      var error;
+	      // Prop type validation may throw. In case they do, we don't want to
+	      // fail the render phase where it didn't fail before. So we log it.
+	      // After these have been cleaned up, we'll let them throw.
+	      try {
+	        error = propTypes[propName](props, propName, componentName, location);
+	      } catch (ex) {
+	        error = ex;
+	      }
+	      if (error instanceof Error && !(error.message in loggedTypeFailures)) {
+	        // Only monitor this failure once because there tends to be a lot of the
+	        // same error.
+	        loggedTypeFailures[error.message] = true;
+	        // This will soon use the warning module
+	        monitorCodeUse("react_failed_descriptor_type_check", { message: error.message });
+	      }
+	    }
+	  }
+	}
+
+	var ReactElementValidator = {
+
+	  createElement: function (type, props, children) {
+	    // We warn in this case but don't throw. We expect the element creation to
+	    // succeed and there will likely be errors in render.
+	    "production" !== process.env.NODE_ENV ? warning(type != null, "React.createElement: type should not be null or undefined. It should " + "be a string (for DOM elements) or a ReactClass (for composite " + "components).") : null;
+
+	    var element = ReactElement.createElement.apply(this, arguments);
+
+	    // The result can be nullish if a mock or a custom function is used.
+	    // TODO: Drop this when these are no longer allowed as the type argument.
+	    if (element == null) {
+	      return element;
+	    }
+
+	    for (var i = 2; i < arguments.length; i++) {
+	      validateChildKeys(arguments[i], type);
+	    }
+
+	    if (type) {
+	      var name = type.displayName;
+	      if (type.propTypes) {
+	        checkPropTypes(name, type.propTypes, element.props, ReactPropTypeLocations.prop);
+	      }
+	      if (type.contextTypes) {
+	        checkPropTypes(name, type.contextTypes, element._context, ReactPropTypeLocations.context);
+	      }
+	    }
+	    return element;
+	  },
+
+	  createFactory: function (type) {
+	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
+	    validatedFactory.type = type;
+	    return validatedFactory;
+	  }
+
+	};
+
+	module.exports = ReactElementValidator;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
 	 * Copyright 2013-2014, Facebook, Inc.
 	 * All rights reserved.
 	 *
@@ -3572,7 +3897,7 @@
 	"use strict";
 
 	var ReactElement = __webpack_require__(20);
-	var ReactElementValidator = __webpack_require__(23);
+	var ReactElementValidator = __webpack_require__(21);
 	var ReactLegacyElement = __webpack_require__(26);
 
 	var mapObject = __webpack_require__(62);
@@ -3735,7 +4060,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -4142,257 +4467,6 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule ReactElementValidator
-	 */
-
-	/**
-	 * ReactElementValidator provides a wrapper around a element factory
-	 * which validates the props passed to the element. This is intended to be
-	 * used only in DEV and could be replaced by a static type checker for languages
-	 * that support it.
-	 */
-
-	"use strict";
-
-	var ReactElement = __webpack_require__(20);
-	var ReactPropTypeLocations = __webpack_require__(57);
-	var ReactCurrentOwner = __webpack_require__(19);
-
-	var monitorCodeUse = __webpack_require__(61);
-	var warning = __webpack_require__(46);
-
-	/**
-	 * Warn if there's no key explicitly set on dynamic arrays of children or
-	 * object keys are not valid. This allows us to keep track of children between
-	 * updates.
-	 */
-	var ownerHasKeyUseWarning = {
-	  react_key_warning: {},
-	  react_numeric_key_warning: {}
-	};
-	var ownerHasMonitoredObjectMap = {};
-
-	var loggedTypeFailures = {};
-
-	var NUMERIC_PROPERTY_REGEX = /^\d+$/;
-
-	/**
-	 * Gets the current owner's displayName for use in warnings.
-	 *
-	 * @internal
-	 * @return {?string} Display name or undefined
-	 */
-	function getCurrentOwnerDisplayName() {
-	  var current = ReactCurrentOwner.current;
-	  return current && current.constructor.displayName || undefined;
-	}
-
-	/**
-	 * Warn if the component doesn't have an explicit key assigned to it.
-	 * This component is in an array. The array could grow and shrink or be
-	 * reordered. All children that haven't already been validated are required to
-	 * have a "key" property assigned to it.
-	 *
-	 * @internal
-	 * @param {ReactComponent} component Component that requires a key.
-	 * @param {*} parentType component's parent's type.
-	 */
-	function validateExplicitKey(component, parentType) {
-	  if (component._store.validated || component.key != null) {
-	    return;
-	  }
-	  component._store.validated = true;
-
-	  warnAndMonitorForKeyUse("react_key_warning", "Each child in an array should have a unique \"key\" prop.", component, parentType);
-	}
-
-	/**
-	 * Warn if the key is being defined as an object property but has an incorrect
-	 * value.
-	 *
-	 * @internal
-	 * @param {string} name Property name of the key.
-	 * @param {ReactComponent} component Component that requires a key.
-	 * @param {*} parentType component's parent's type.
-	 */
-	function validatePropertyKey(name, component, parentType) {
-	  if (!NUMERIC_PROPERTY_REGEX.test(name)) {
-	    return;
-	  }
-	  warnAndMonitorForKeyUse("react_numeric_key_warning", "Child objects should have non-numeric keys so ordering is preserved.", component, parentType);
-	}
-
-	/**
-	 * Shared warning and monitoring code for the key warnings.
-	 *
-	 * @internal
-	 * @param {string} warningID The id used when logging.
-	 * @param {string} message The base warning that gets output.
-	 * @param {ReactComponent} component Component that requires a key.
-	 * @param {*} parentType component's parent's type.
-	 */
-	function warnAndMonitorForKeyUse(warningID, message, component, parentType) {
-	  var ownerName = getCurrentOwnerDisplayName();
-	  var parentName = parentType.displayName;
-
-	  var useName = ownerName || parentName;
-	  var memoizer = ownerHasKeyUseWarning[warningID];
-	  if (memoizer.hasOwnProperty(useName)) {
-	    return;
-	  }
-	  memoizer[useName] = true;
-
-	  message += ownerName ? " Check the render method of " + ownerName + "." : " Check the renderComponent call using <" + parentName + ">.";
-
-	  // Usually the current owner is the offender, but if it accepts children as a
-	  // property, it may be the creator of the child that's responsible for
-	  // assigning it a key.
-	  var childOwnerName = null;
-	  if (component._owner && component._owner !== ReactCurrentOwner.current) {
-	    // Name of the component that originally created this child.
-	    childOwnerName = component._owner.constructor.displayName;
-
-	    message += " It was passed a child from " + childOwnerName + ".";
-	  }
-
-	  message += " See http://fb.me/react-warning-keys for more information.";
-	  monitorCodeUse(warningID, {
-	    component: useName,
-	    componentOwner: childOwnerName
-	  });
-	  console.warn(message);
-	}
-
-	/**
-	 * Log that we're using an object map. We're considering deprecating this
-	 * feature and replace it with proper Map and ImmutableMap data structures.
-	 *
-	 * @internal
-	 */
-	function monitorUseOfObjectMap() {
-	  var currentName = getCurrentOwnerDisplayName() || "";
-	  if (ownerHasMonitoredObjectMap.hasOwnProperty(currentName)) {
-	    return;
-	  }
-	  ownerHasMonitoredObjectMap[currentName] = true;
-	  monitorCodeUse("react_object_map_children");
-	}
-
-	/**
-	 * Ensure that every component either is passed in a static location, in an
-	 * array with an explicit keys property defined, or in an object literal
-	 * with valid key property.
-	 *
-	 * @internal
-	 * @param {*} component Statically passed child of any type.
-	 * @param {*} parentType component's parent's type.
-	 * @return {boolean}
-	 */
-	function validateChildKeys(component, parentType) {
-	  if (Array.isArray(component)) {
-	    for (var i = 0; i < component.length; i++) {
-	      var child = component[i];
-	      if (ReactElement.isValidElement(child)) {
-	        validateExplicitKey(child, parentType);
-	      }
-	    }
-	  } else if (ReactElement.isValidElement(component)) {
-	    // This component was passed in a valid location.
-	    component._store.validated = true;
-	  } else if (component && typeof component === "object") {
-	    monitorUseOfObjectMap();
-	    for (var name in component) {
-	      validatePropertyKey(name, component[name], parentType);
-	    }
-	  }
-	}
-
-	/**
-	 * Assert that the props are valid
-	 *
-	 * @param {string} componentName Name of the component for error messages.
-	 * @param {object} propTypes Map of prop name to a ReactPropType
-	 * @param {object} props
-	 * @param {string} location e.g. "prop", "context", "child context"
-	 * @private
-	 */
-	function checkPropTypes(componentName, propTypes, props, location) {
-	  for (var propName in propTypes) {
-	    if (propTypes.hasOwnProperty(propName)) {
-	      var error;
-	      // Prop type validation may throw. In case they do, we don't want to
-	      // fail the render phase where it didn't fail before. So we log it.
-	      // After these have been cleaned up, we'll let them throw.
-	      try {
-	        error = propTypes[propName](props, propName, componentName, location);
-	      } catch (ex) {
-	        error = ex;
-	      }
-	      if (error instanceof Error && !(error.message in loggedTypeFailures)) {
-	        // Only monitor this failure once because there tends to be a lot of the
-	        // same error.
-	        loggedTypeFailures[error.message] = true;
-	        // This will soon use the warning module
-	        monitorCodeUse("react_failed_descriptor_type_check", { message: error.message });
-	      }
-	    }
-	  }
-	}
-
-	var ReactElementValidator = {
-
-	  createElement: function (type, props, children) {
-	    // We warn in this case but don't throw. We expect the element creation to
-	    // succeed and there will likely be errors in render.
-	    "production" !== process.env.NODE_ENV ? warning(type != null, "React.createElement: type should not be null or undefined. It should " + "be a string (for DOM elements) or a ReactClass (for composite " + "components).") : null;
-
-	    var element = ReactElement.createElement.apply(this, arguments);
-
-	    // The result can be nullish if a mock or a custom function is used.
-	    // TODO: Drop this when these are no longer allowed as the type argument.
-	    if (element == null) {
-	      return element;
-	    }
-
-	    for (var i = 2; i < arguments.length; i++) {
-	      validateChildKeys(arguments[i], type);
-	    }
-
-	    if (type) {
-	      var name = type.displayName;
-	      if (type.propTypes) {
-	        checkPropTypes(name, type.propTypes, element.props, ReactPropTypeLocations.prop);
-	      }
-	      if (type.contextTypes) {
-	        checkPropTypes(name, type.contextTypes, element._context, ReactPropTypeLocations.context);
-	      }
-	    }
-	    return element;
-	  },
-
-	  createFactory: function (type) {
-	    var validatedFactory = ReactElementValidator.createElement.bind(null, type);
-	    validatedFactory.type = type;
-	    return validatedFactory;
-	  }
-
-	};
-
-	module.exports = ReactElementValidator;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
-
-/***/ },
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4409,36 +4483,36 @@
 
 	"use strict";
 
-	var BeforeInputEventPlugin = __webpack_require__(68);
-	var ChangeEventPlugin = __webpack_require__(69);
-	var ClientReactRootIndex = __webpack_require__(70);
-	var CompositionEventPlugin = __webpack_require__(71);
-	var DefaultEventPluginOrder = __webpack_require__(72);
-	var EnterLeaveEventPlugin = __webpack_require__(73);
+	var BeforeInputEventPlugin = __webpack_require__(69);
+	var ChangeEventPlugin = __webpack_require__(70);
+	var ClientReactRootIndex = __webpack_require__(71);
+	var CompositionEventPlugin = __webpack_require__(72);
+	var DefaultEventPluginOrder = __webpack_require__(73);
+	var EnterLeaveEventPlugin = __webpack_require__(74);
 	var ExecutionEnvironment = __webpack_require__(36);
-	var HTMLDOMPropertyConfig = __webpack_require__(74);
-	var MobileSafariClickEventPlugin = __webpack_require__(75);
+	var HTMLDOMPropertyConfig = __webpack_require__(75);
+	var MobileSafariClickEventPlugin = __webpack_require__(76);
 	var ReactBrowserComponentMixin = __webpack_require__(65);
-	var ReactComponentBrowserEnvironment = __webpack_require__(76);
-	var ReactDefaultBatchingStrategy = __webpack_require__(77);
-	var ReactDOMComponent = __webpack_require__(22);
-	var ReactDOMButton = __webpack_require__(78);
-	var ReactDOMForm = __webpack_require__(79);
-	var ReactDOMImg = __webpack_require__(80);
-	var ReactDOMInput = __webpack_require__(81);
-	var ReactDOMOption = __webpack_require__(82);
-	var ReactDOMSelect = __webpack_require__(83);
-	var ReactDOMTextarea = __webpack_require__(84);
-	var ReactEventListener = __webpack_require__(85);
-	var ReactInjection = __webpack_require__(86);
+	var ReactComponentBrowserEnvironment = __webpack_require__(77);
+	var ReactDefaultBatchingStrategy = __webpack_require__(78);
+	var ReactDOMComponent = __webpack_require__(23);
+	var ReactDOMButton = __webpack_require__(79);
+	var ReactDOMForm = __webpack_require__(80);
+	var ReactDOMImg = __webpack_require__(81);
+	var ReactDOMInput = __webpack_require__(82);
+	var ReactDOMOption = __webpack_require__(83);
+	var ReactDOMSelect = __webpack_require__(84);
+	var ReactDOMTextarea = __webpack_require__(85);
+	var ReactEventListener = __webpack_require__(86);
+	var ReactInjection = __webpack_require__(87);
 	var ReactInstanceHandles = __webpack_require__(25);
 	var ReactMount = __webpack_require__(27);
-	var SelectEventPlugin = __webpack_require__(87);
-	var ServerReactRootIndex = __webpack_require__(88);
-	var SimpleEventPlugin = __webpack_require__(89);
-	var SVGDOMPropertyConfig = __webpack_require__(90);
+	var SelectEventPlugin = __webpack_require__(88);
+	var ServerReactRootIndex = __webpack_require__(89);
+	var SimpleEventPlugin = __webpack_require__(90);
+	var SVGDOMPropertyConfig = __webpack_require__(91);
 
-	var createFullPageComponent = __webpack_require__(91);
+	var createFullPageComponent = __webpack_require__(92);
 
 	function inject() {
 	  ReactInjection.EventEmitter.injectReactEventListener(ReactEventListener);
@@ -4499,7 +4573,7 @@
 	  if ("production" !== process.env.NODE_ENV) {
 	    var url = ExecutionEnvironment.canUseDOM && window.location.href || "";
 	    if (/[?&]react_perf\b/.test(url)) {
-	      var ReactDefaultPerf = __webpack_require__(92);
+	      var ReactDefaultPerf = __webpack_require__(93);
 	      ReactDefaultPerf.start();
 	    }
 	  }
@@ -4528,7 +4602,7 @@
 
 	"use strict";
 
-	var ReactRootIndex = __webpack_require__(93);
+	var ReactRootIndex = __webpack_require__(68);
 
 	var invariant = __webpack_require__(48);
 
@@ -6809,7 +6883,8 @@
 	  LOAD_MORE: null,
 	  FAVORITES: null,
 	  GET_MEW_ITEMS: null,
-	  GET_MEW_ITEMS_ERROR: null
+	  GET_MEW_ITEMS_ERROR: null,
+	  TOGGLE_FAVORITE: null
 	}),
 	    ACTIONS_PRES_VIEW = keyMirror({
 	  OPEN: null
@@ -6860,6 +6935,16 @@
 	    fetch(url).then(handleNewItemsResponse).then(handleNewItems)["catch"](function (error) {
 	      PresListActions.getNewItemsError(error);
 	    });
+	  },
+
+	  /**
+	   * Toggle favorite status for item
+	   * @param {number} id
+	   */
+	  toggleItemFavorite: function toggleItemFavorite(id) {
+	    // here should be request to server
+
+	    console.log("Toggle favorire: ", id);
 	  }
 	};
 
@@ -6915,11 +7000,11 @@
 
 	"use strict";
 
-	var LinkedStateMixin = __webpack_require__(104);
+	var LinkedStateMixin = __webpack_require__(101);
 	var React = __webpack_require__(6);
-	var ReactComponentWithPureRenderMixin = __webpack_require__(101);
-	var ReactCSSTransitionGroup = __webpack_require__(102);
-	var ReactTransitionGroup = __webpack_require__(103);
+	var ReactComponentWithPureRenderMixin = __webpack_require__(102);
+	var ReactCSSTransitionGroup = __webpack_require__(103);
+	var ReactTransitionGroup = __webpack_require__(104);
 	var ReactUpdates = __webpack_require__(52);
 
 	var cx = __webpack_require__(105);
@@ -6939,7 +7024,7 @@
 	};
 
 	if ("production" !== process.env.NODE_ENV) {
-	  React.addons.Perf = __webpack_require__(92);
+	  React.addons.Perf = __webpack_require__(93);
 	  React.addons.TestUtils = __webpack_require__(108);
 	}
 
@@ -8112,7 +8197,7 @@
 
 	"use strict";
 
-	var emptyObject = __webpack_require__(114);
+	var emptyObject = __webpack_require__(112);
 	var invariant = __webpack_require__(48);
 
 	/**
@@ -8248,11 +8333,11 @@
 
 	"use strict";
 
-	var CallbackQueue = __webpack_require__(112);
+	var CallbackQueue = __webpack_require__(113);
 	var PooledClass = __webpack_require__(49);
 	var ReactCurrentOwner = __webpack_require__(19);
 	var ReactPerf = __webpack_require__(29);
-	var Transaction = __webpack_require__(113);
+	var Transaction = __webpack_require__(114);
 
 	var assign = __webpack_require__(33);
 	var invariant = __webpack_require__(48);
@@ -9656,6 +9741,40 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactRootIndex
+	 * @typechecks
+	 */
+
+	"use strict";
+
+	var ReactRootIndexInjection = {
+	  /**
+	   * @param {function} _createReactRootIndex
+	   */
+	  injectCreateReactRootIndex: function (_createReactRootIndex) {
+	    ReactRootIndex.createReactRootIndex = _createReactRootIndex;
+	  }
+	};
+
+	var ReactRootIndex = {
+	  createReactRootIndex: null,
+	  injection: ReactRootIndexInjection
+	};
+
+	module.exports = ReactRootIndex;
+
+/***/ },
+/* 69 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
 	 * Copyright 2013 Facebook, Inc.
 	 * All rights reserved.
 	 *
@@ -9853,7 +9972,7 @@
 	module.exports = BeforeInputEventPlugin;
 
 /***/ },
-/* 69 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -10175,7 +10294,7 @@
 	module.exports = ChangeEventPlugin;
 
 /***/ },
-/* 70 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -10203,7 +10322,7 @@
 	module.exports = ClientReactRootIndex;
 
 /***/ },
-/* 71 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -10419,7 +10538,7 @@
 	module.exports = CompositionEventPlugin;
 
 /***/ },
-/* 72 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -10451,7 +10570,7 @@
 	module.exports = DefaultEventPluginOrder;
 
 /***/ },
-/* 73 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -10572,7 +10691,7 @@
 	module.exports = EnterLeaveEventPlugin;
 
 /***/ },
-/* 74 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -10756,7 +10875,7 @@
 	module.exports = HTMLDOMPropertyConfig;
 
 /***/ },
-/* 75 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -10813,7 +10932,7 @@
 	module.exports = MobileSafariClickEventPlugin;
 
 /***/ },
-/* 76 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -10897,7 +11016,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 77 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -10914,7 +11033,7 @@
 	"use strict";
 
 	var ReactUpdates = __webpack_require__(52);
-	var Transaction = __webpack_require__(113);
+	var Transaction = __webpack_require__(114);
 
 	var assign = __webpack_require__(33);
 	var emptyFunction = __webpack_require__(98);
@@ -10969,7 +11088,7 @@
 	module.exports = ReactDefaultBatchingStrategy;
 
 /***/ },
-/* 78 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -10989,7 +11108,7 @@
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
-	var ReactDOM = __webpack_require__(21);
+	var ReactDOM = __webpack_require__(22);
 
 	var keyMirror = __webpack_require__(53);
 
@@ -11036,7 +11155,7 @@
 	module.exports = ReactDOMButton;
 
 /***/ },
-/* 79 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -11057,7 +11176,7 @@
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
-	var ReactDOM = __webpack_require__(21);
+	var ReactDOM = __webpack_require__(22);
 
 	// Store a reference to the <form> `ReactDOMComponent`. TODO: use string
 	var form = ReactElement.createFactory(ReactDOM.form.type);
@@ -11089,7 +11208,7 @@
 	module.exports = ReactDOMForm;
 
 /***/ },
-/* 80 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -11110,7 +11229,7 @@
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
-	var ReactDOM = __webpack_require__(21);
+	var ReactDOM = __webpack_require__(22);
 
 	// Store a reference to the <img> `ReactDOMComponent`. TODO: use string
 	var img = ReactElement.createFactory(ReactDOM.img.type);
@@ -11140,7 +11259,7 @@
 	module.exports = ReactDOMImg;
 
 /***/ },
-/* 81 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -11162,7 +11281,7 @@
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
-	var ReactDOM = __webpack_require__(21);
+	var ReactDOM = __webpack_require__(22);
 	var ReactMount = __webpack_require__(27);
 	var ReactUpdates = __webpack_require__(52);
 
@@ -11306,7 +11425,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 82 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -11325,7 +11444,7 @@
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
-	var ReactDOM = __webpack_require__(21);
+	var ReactDOM = __webpack_require__(22);
 
 	var warning = __webpack_require__(46);
 
@@ -11357,7 +11476,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 83 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -11378,7 +11497,7 @@
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
-	var ReactDOM = __webpack_require__(21);
+	var ReactDOM = __webpack_require__(22);
 	var ReactUpdates = __webpack_require__(52);
 
 	var assign = __webpack_require__(33);
@@ -11536,7 +11655,7 @@
 	module.exports = ReactDOMSelect;
 
 /***/ },
-/* 84 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -11558,7 +11677,7 @@
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
-	var ReactDOM = __webpack_require__(21);
+	var ReactDOM = __webpack_require__(22);
 	var ReactUpdates = __webpack_require__(52);
 
 	var assign = __webpack_require__(33);
@@ -11666,7 +11785,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 85 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -11832,7 +11951,7 @@
 	module.exports = ReactEventListener;
 
 /***/ },
-/* 86 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -11856,7 +11975,7 @@
 	var ReactBrowserEventEmitter = __webpack_require__(66);
 	var ReactNativeComponent = __webpack_require__(116);
 	var ReactPerf = __webpack_require__(29);
-	var ReactRootIndex = __webpack_require__(93);
+	var ReactRootIndex = __webpack_require__(68);
 	var ReactUpdates = __webpack_require__(52);
 
 	var ReactInjection = {
@@ -11875,7 +11994,7 @@
 	module.exports = ReactInjection;
 
 /***/ },
-/* 87 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -12052,7 +12171,7 @@
 	module.exports = SelectEventPlugin;
 
 /***/ },
-/* 88 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -12086,7 +12205,7 @@
 	module.exports = ServerReactRootIndex;
 
 /***/ },
-/* 89 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -12499,7 +12618,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 90 */
+/* 91 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -12594,7 +12713,7 @@
 	module.exports = SVGDOMPropertyConfig;
 
 /***/ },
-/* 91 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -12650,7 +12769,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 92 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -12876,40 +12995,6 @@
 	};
 
 	module.exports = ReactDefaultPerf;
-
-/***/ },
-/* 93 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule ReactRootIndex
-	 * @typechecks
-	 */
-
-	"use strict";
-
-	var ReactRootIndexInjection = {
-	  /**
-	   * @param {function} _createReactRootIndex
-	   */
-	  injectCreateReactRootIndex: function (_createReactRootIndex) {
-	    ReactRootIndex.createReactRootIndex = _createReactRootIndex;
-	  }
-	};
-
-	var ReactRootIndex = {
-	  createReactRootIndex: null,
-	  injection: ReactRootIndexInjection
-	};
-
-	module.exports = ReactRootIndex;
 
 /***/ },
 /* 94 */
@@ -13165,7 +13250,7 @@
 
 	"use strict";
 
-	var adler32 = __webpack_require__(155);
+	var adler32 = __webpack_require__(156);
 
 	var ReactMarkupChecksum = {
 	  CHECKSUM_ATTR_NAME: "data-react-checksum",
@@ -13213,9 +13298,9 @@
 	"use strict";
 
 	var PooledClass = __webpack_require__(49);
-	var CallbackQueue = __webpack_require__(112);
-	var ReactPutListenerQueue = __webpack_require__(156);
-	var Transaction = __webpack_require__(113);
+	var CallbackQueue = __webpack_require__(113);
+	var ReactPutListenerQueue = __webpack_require__(155);
+	var Transaction = __webpack_require__(114);
 
 	var assign = __webpack_require__(33);
 	var emptyFunction = __webpack_require__(98);
@@ -13315,6 +13400,47 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
+	 * @providesModule LinkedStateMixin
+	 * @typechecks static-only
+	 */
+
+	"use strict";
+
+	var ReactLink = __webpack_require__(157);
+	var ReactStateSetters = __webpack_require__(158);
+
+	/**
+	 * A simple mixin around ReactLink.forState().
+	 */
+	var LinkedStateMixin = {
+	  /**
+	   * Create a ReactLink that's linked to part of this component's state. The
+	   * ReactLink will have the current value of this.state[key] and will call
+	   * setState() when a change is requested.
+	   *
+	   * @param {string} key state key to update. Note: you may want to use keyOf()
+	   * if you're using Google Closure Compiler advanced mode.
+	   * @return {ReactLink} ReactLink instance linking to the state.
+	   */
+	  linkState: function (key) {
+	    return new ReactLink(this.state[key], ReactStateSetters.createStateKeySetter(this, key));
+	  }
+	};
+
+	module.exports = LinkedStateMixin;
+
+/***/ },
+/* 102 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
 	* @providesModule ReactComponentWithPureRenderMixin
 	*/
 
@@ -13355,7 +13481,7 @@
 	module.exports = ReactComponentWithPureRenderMixin;
 
 /***/ },
-/* 102 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -13376,8 +13502,8 @@
 
 	var assign = __webpack_require__(33);
 
-	var ReactTransitionGroup = React.createFactory(__webpack_require__(103));
-	var ReactCSSTransitionGroupChild = React.createFactory(__webpack_require__(157));
+	var ReactTransitionGroup = React.createFactory(__webpack_require__(104));
+	var ReactCSSTransitionGroupChild = React.createFactory(__webpack_require__(159));
 
 	var ReactCSSTransitionGroup = React.createClass({
 	  displayName: "ReactCSSTransitionGroup",
@@ -13414,7 +13540,7 @@
 	module.exports = ReactCSSTransitionGroup;
 
 /***/ },
-/* 103 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -13431,7 +13557,7 @@
 	"use strict";
 
 	var React = __webpack_require__(6);
-	var ReactTransitionChildMapping = __webpack_require__(158);
+	var ReactTransitionChildMapping = __webpack_require__(160);
 
 	var assign = __webpack_require__(33);
 	var cloneWithProps = __webpack_require__(106);
@@ -13584,47 +13710,6 @@
 	});
 
 	module.exports = ReactTransitionGroup;
-
-/***/ },
-/* 104 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule LinkedStateMixin
-	 * @typechecks static-only
-	 */
-
-	"use strict";
-
-	var ReactLink = __webpack_require__(159);
-	var ReactStateSetters = __webpack_require__(160);
-
-	/**
-	 * A simple mixin around ReactLink.forState().
-	 */
-	var LinkedStateMixin = {
-	  /**
-	   * Create a ReactLink that's linked to part of this component's state. The
-	   * ReactLink will have the current value of this.state[key] and will call
-	   * setState() when a change is requested.
-	   *
-	   * @param {string} key state key to update. Note: you may want to use keyOf()
-	   * if you're using Google Closure Compiler advanced mode.
-	   * @return {ReactLink} ReactLink instance linking to the state.
-	   */
-	  linkState: function (key) {
-	    return new ReactLink(this.state[key], ReactStateSetters.createStateKeySetter(this, key));
-	  }
-	};
-
-	module.exports = LinkedStateMixin;
 
 /***/ },
 /* 105 */
@@ -14609,6 +14694,32 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
+	 * @providesModule emptyObject
+	 */
+
+	"use strict";
+
+	var emptyObject = {};
+
+	if ("production" !== process.env.NODE_ENV) {
+	  Object.freeze(emptyObject);
+	}
+
+	module.exports = emptyObject;
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
+
+/***/ },
+/* 113 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
 	 * @providesModule CallbackQueue
 	 */
 
@@ -14697,7 +14808,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 113 */
+/* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -14925,32 +15036,6 @@
 	};
 
 	module.exports = Transaction;
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
-
-/***/ },
-/* 114 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule emptyObject
-	 */
-
-	"use strict";
-
-	var emptyObject = {};
-
-	if ("production" !== process.env.NODE_ENV) {
-	  Object.freeze(emptyObject);
-	}
-
-	module.exports = emptyObject;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
@@ -15309,7 +15394,7 @@
 
 	"use strict";
 
-	var hyphenate = __webpack_require__(165);
+	var hyphenate = __webpack_require__(163);
 
 	var msPattern = /^ms-/;
 
@@ -15355,8 +15440,8 @@
 	var EventPluginRegistry = __webpack_require__(122);
 	var EventPluginUtils = __webpack_require__(14);
 
-	var accumulateInto = __webpack_require__(163);
-	var forEachAccumulated = __webpack_require__(164);
+	var accumulateInto = __webpack_require__(164);
+	var forEachAccumulated = __webpack_require__(165);
 	var invariant = __webpack_require__(48);
 
 	/**
@@ -15918,8 +16003,8 @@
 	var EventConstants = __webpack_require__(47);
 	var EventPluginHub = __webpack_require__(121);
 
-	var accumulateInto = __webpack_require__(163);
-	var forEachAccumulated = __webpack_require__(164);
+	var accumulateInto = __webpack_require__(164);
+	var forEachAccumulated = __webpack_require__(165);
 
 	var PropagationPhases = EventConstants.PropagationPhases;
 	var getListener = EventPluginHub.getListener;
@@ -16730,12 +16815,12 @@
 
 	"use strict";
 
-	var CallbackQueue = __webpack_require__(112);
+	var CallbackQueue = __webpack_require__(113);
 	var PooledClass = __webpack_require__(49);
 	var ReactBrowserEventEmitter = __webpack_require__(66);
 	var ReactInputSelection = __webpack_require__(129);
-	var ReactPutListenerQueue = __webpack_require__(156);
-	var Transaction = __webpack_require__(113);
+	var ReactPutListenerQueue = __webpack_require__(155);
+	var Transaction = __webpack_require__(114);
 
 	var assign = __webpack_require__(33);
 
@@ -17015,8 +17100,8 @@
 
 	var ReactBrowserEventEmitter = __webpack_require__(66);
 
-	var accumulateInto = __webpack_require__(163);
-	var forEachAccumulated = __webpack_require__(164);
+	var accumulateInto = __webpack_require__(164);
+	var forEachAccumulated = __webpack_require__(165);
 	var invariant = __webpack_require__(48);
 
 	function remove(event) {
@@ -18088,7 +18173,7 @@
 	 * @typechecks
 	 */
 
-	var performance = __webpack_require__(172);
+	var performance = __webpack_require__(171);
 
 	/**
 	 * Detect if we can use `window.performance.now()` and gracefully fallback to
@@ -18121,7 +18206,7 @@
 	 * @typechecks
 	 */
 
-	var isNode = __webpack_require__(171);
+	var isNode = __webpack_require__(172);
 
 	/**
 	 * @param {*} object The object to check.
@@ -18135,43 +18220,6 @@
 
 /***/ },
 /* 155 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule adler32
-	 */
-
-	/* jslint bitwise:true */
-
-	"use strict";
-
-	var MOD = 65521;
-
-	// This is a clean-room implementation of adler32 designed for detecting
-	// if markup is not what we expect it to be. It does not need to be
-	// cryptographically strong, only reasonably good at detecting if markup
-	// generated on the server is different than that on the client.
-	function adler32(data) {
-	  var a = 1;
-	  var b = 0;
-	  for (var i = 0; i < data.length; i++) {
-	    a = (a + data.charCodeAt(i)) % MOD;
-	    b = (b + a) % MOD;
-	  }
-	  return a | b << 16;
-	}
-
-	module.exports = adler32;
-
-/***/ },
-/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -18226,7 +18274,227 @@
 	module.exports = ReactPutListenerQueue;
 
 /***/ },
+/* 156 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule adler32
+	 */
+
+	/* jslint bitwise:true */
+
+	"use strict";
+
+	var MOD = 65521;
+
+	// This is a clean-room implementation of adler32 designed for detecting
+	// if markup is not what we expect it to be. It does not need to be
+	// cryptographically strong, only reasonably good at detecting if markup
+	// generated on the server is different than that on the client.
+	function adler32(data) {
+	  var a = 1;
+	  var b = 0;
+	  for (var i = 0; i < data.length; i++) {
+	    a = (a + data.charCodeAt(i)) % MOD;
+	    b = (b + a) % MOD;
+	  }
+	  return a | b << 16;
+	}
+
+	module.exports = adler32;
+
+/***/ },
 /* 157 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactLink
+	 * @typechecks static-only
+	 */
+
+	"use strict";
+
+	/**
+	 * ReactLink encapsulates a common pattern in which a component wants to modify
+	 * a prop received from its parent. ReactLink allows the parent to pass down a
+	 * value coupled with a callback that, when invoked, expresses an intent to
+	 * modify that value. For example:
+	 *
+	 * React.createClass({
+	 *   getInitialState: function() {
+	 *     return {value: ''};
+	 *   },
+	 *   render: function() {
+	 *     var valueLink = new ReactLink(this.state.value, this._handleValueChange);
+	 *     return <input valueLink={valueLink} />;
+	 *   },
+	 *   this._handleValueChange: function(newValue) {
+	 *     this.setState({value: newValue});
+	 *   }
+	 * });
+	 *
+	 * We have provided some sugary mixins to make the creation and
+	 * consumption of ReactLink easier; see LinkedValueUtils and LinkedStateMixin.
+	 */
+
+	var React = __webpack_require__(6);
+
+	/**
+	 * @param {*} value current value of the link
+	 * @param {function} requestChange callback to request a change
+	 */
+	function ReactLink(value, requestChange) {
+	  this.value = value;
+	  this.requestChange = requestChange;
+	}
+
+	/**
+	 * Creates a PropType that enforces the ReactLink API and optionally checks the
+	 * type of the value being passed inside the link. Example:
+	 *
+	 * MyComponent.propTypes = {
+	 *   tabIndexLink: ReactLink.PropTypes.link(React.PropTypes.number)
+	 * }
+	 */
+	function createLinkTypeChecker(linkType) {
+	  var shapes = {
+	    value: typeof linkType === "undefined" ? React.PropTypes.any.isRequired : linkType.isRequired,
+	    requestChange: React.PropTypes.func.isRequired
+	  };
+	  return React.PropTypes.shape(shapes);
+	}
+
+	ReactLink.PropTypes = {
+	  link: createLinkTypeChecker
+	};
+
+	module.exports = ReactLink;
+
+/***/ },
+/* 158 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule ReactStateSetters
+	 */
+
+	"use strict";
+
+	var ReactStateSetters = {
+	  /**
+	   * Returns a function that calls the provided function, and uses the result
+	   * of that to set the component's state.
+	   *
+	   * @param {ReactCompositeComponent} component
+	   * @param {function} funcReturningState Returned callback uses this to
+	   *                                      determine how to update state.
+	   * @return {function} callback that when invoked uses funcReturningState to
+	   *                    determined the object literal to setState.
+	   */
+	  createStateSetter: function (component, funcReturningState) {
+	    return function (a, b, c, d, e, f) {
+	      var partialState = funcReturningState.call(component, a, b, c, d, e, f);
+	      if (partialState) {
+	        component.setState(partialState);
+	      }
+	    };
+	  },
+
+	  /**
+	   * Returns a single-argument callback that can be used to update a single
+	   * key in the component's state.
+	   *
+	   * Note: this is memoized function, which makes it inexpensive to call.
+	   *
+	   * @param {ReactCompositeComponent} component
+	   * @param {string} key The key in the state that you should update.
+	   * @return {function} callback of 1 argument which calls setState() with
+	   *                    the provided keyName and callback argument.
+	   */
+	  createStateKeySetter: function (component, key) {
+	    // Memoize the setters.
+	    var cache = component.__keySetters || (component.__keySetters = {});
+	    return cache[key] || (cache[key] = createStateKeySetter(component, key));
+	  }
+	};
+
+	function createStateKeySetter(component, key) {
+	  // Partial state is allocated outside of the function closure so it can be
+	  // reused with every call, avoiding memory allocation when this function
+	  // is called.
+	  var partialState = {};
+	  return function stateKeySetter(value) {
+	    partialState[key] = value;
+	    component.setState(partialState);
+	  };
+	}
+
+	ReactStateSetters.Mixin = {
+	  /**
+	   * Returns a function that calls the provided function, and uses the result
+	   * of that to set the component's state.
+	   *
+	   * For example, these statements are equivalent:
+	   *
+	   *   this.setState({x: 1});
+	   *   this.createStateSetter(function(xValue) {
+	   *     return {x: xValue};
+	   *   })(1);
+	   *
+	   * @param {function} funcReturningState Returned callback uses this to
+	   *                                      determine how to update state.
+	   * @return {function} callback that when invoked uses funcReturningState to
+	   *                    determined the object literal to setState.
+	   */
+	  createStateSetter: function (funcReturningState) {
+	    return ReactStateSetters.createStateSetter(this, funcReturningState);
+	  },
+
+	  /**
+	   * Returns a single-argument callback that can be used to update a single
+	   * key in the component's state.
+	   *
+	   * For example, these statements are equivalent:
+	   *
+	   *   this.setState({x: 1});
+	   *   this.createStateKeySetter('x')(1);
+	   *
+	   * Note: this is memoized function, which makes it inexpensive to call.
+	   *
+	   * @param {string} key The key in the state that you should update.
+	   * @return {function} callback of 1 argument which calls setState() with
+	   *                    the provided keyName and callback argument.
+	   */
+	  createStateKeySetter: function (key) {
+	    return ReactStateSetters.createStateKeySetter(this, key);
+	  }
+	};
+
+	module.exports = ReactStateSetters;
+
+/***/ },
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -18356,7 +18624,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 158 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -18456,189 +18724,6 @@
 	};
 
 	module.exports = ReactTransitionChildMapping;
-
-/***/ },
-/* 159 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule ReactLink
-	 * @typechecks static-only
-	 */
-
-	"use strict";
-
-	/**
-	 * ReactLink encapsulates a common pattern in which a component wants to modify
-	 * a prop received from its parent. ReactLink allows the parent to pass down a
-	 * value coupled with a callback that, when invoked, expresses an intent to
-	 * modify that value. For example:
-	 *
-	 * React.createClass({
-	 *   getInitialState: function() {
-	 *     return {value: ''};
-	 *   },
-	 *   render: function() {
-	 *     var valueLink = new ReactLink(this.state.value, this._handleValueChange);
-	 *     return <input valueLink={valueLink} />;
-	 *   },
-	 *   this._handleValueChange: function(newValue) {
-	 *     this.setState({value: newValue});
-	 *   }
-	 * });
-	 *
-	 * We have provided some sugary mixins to make the creation and
-	 * consumption of ReactLink easier; see LinkedValueUtils and LinkedStateMixin.
-	 */
-
-	var React = __webpack_require__(6);
-
-	/**
-	 * @param {*} value current value of the link
-	 * @param {function} requestChange callback to request a change
-	 */
-	function ReactLink(value, requestChange) {
-	  this.value = value;
-	  this.requestChange = requestChange;
-	}
-
-	/**
-	 * Creates a PropType that enforces the ReactLink API and optionally checks the
-	 * type of the value being passed inside the link. Example:
-	 *
-	 * MyComponent.propTypes = {
-	 *   tabIndexLink: ReactLink.PropTypes.link(React.PropTypes.number)
-	 * }
-	 */
-	function createLinkTypeChecker(linkType) {
-	  var shapes = {
-	    value: typeof linkType === "undefined" ? React.PropTypes.any.isRequired : linkType.isRequired,
-	    requestChange: React.PropTypes.func.isRequired
-	  };
-	  return React.PropTypes.shape(shapes);
-	}
-
-	ReactLink.PropTypes = {
-	  link: createLinkTypeChecker
-	};
-
-	module.exports = ReactLink;
-
-/***/ },
-/* 160 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule ReactStateSetters
-	 */
-
-	"use strict";
-
-	var ReactStateSetters = {
-	  /**
-	   * Returns a function that calls the provided function, and uses the result
-	   * of that to set the component's state.
-	   *
-	   * @param {ReactCompositeComponent} component
-	   * @param {function} funcReturningState Returned callback uses this to
-	   *                                      determine how to update state.
-	   * @return {function} callback that when invoked uses funcReturningState to
-	   *                    determined the object literal to setState.
-	   */
-	  createStateSetter: function (component, funcReturningState) {
-	    return function (a, b, c, d, e, f) {
-	      var partialState = funcReturningState.call(component, a, b, c, d, e, f);
-	      if (partialState) {
-	        component.setState(partialState);
-	      }
-	    };
-	  },
-
-	  /**
-	   * Returns a single-argument callback that can be used to update a single
-	   * key in the component's state.
-	   *
-	   * Note: this is memoized function, which makes it inexpensive to call.
-	   *
-	   * @param {ReactCompositeComponent} component
-	   * @param {string} key The key in the state that you should update.
-	   * @return {function} callback of 1 argument which calls setState() with
-	   *                    the provided keyName and callback argument.
-	   */
-	  createStateKeySetter: function (component, key) {
-	    // Memoize the setters.
-	    var cache = component.__keySetters || (component.__keySetters = {});
-	    return cache[key] || (cache[key] = createStateKeySetter(component, key));
-	  }
-	};
-
-	function createStateKeySetter(component, key) {
-	  // Partial state is allocated outside of the function closure so it can be
-	  // reused with every call, avoiding memory allocation when this function
-	  // is called.
-	  var partialState = {};
-	  return function stateKeySetter(value) {
-	    partialState[key] = value;
-	    component.setState(partialState);
-	  };
-	}
-
-	ReactStateSetters.Mixin = {
-	  /**
-	   * Returns a function that calls the provided function, and uses the result
-	   * of that to set the component's state.
-	   *
-	   * For example, these statements are equivalent:
-	   *
-	   *   this.setState({x: 1});
-	   *   this.createStateSetter(function(xValue) {
-	   *     return {x: xValue};
-	   *   })(1);
-	   *
-	   * @param {function} funcReturningState Returned callback uses this to
-	   *                                      determine how to update state.
-	   * @return {function} callback that when invoked uses funcReturningState to
-	   *                    determined the object literal to setState.
-	   */
-	  createStateSetter: function (funcReturningState) {
-	    return ReactStateSetters.createStateSetter(this, funcReturningState);
-	  },
-
-	  /**
-	   * Returns a single-argument callback that can be used to update a single
-	   * key in the component's state.
-	   *
-	   * For example, these statements are equivalent:
-	   *
-	   *   this.setState({x: 1});
-	   *   this.createStateKeySetter('x')(1);
-	   *
-	   * Note: this is memoized function, which makes it inexpensive to call.
-	   *
-	   * @param {string} key The key in the state that you should update.
-	   * @return {function} callback of 1 argument which calls setState() with
-	   *                    the provided keyName and callback argument.
-	   */
-	  createStateKeySetter: function (key) {
-	    return ReactStateSetters.createStateKeySetter(this, key);
-	  }
-	};
-
-	module.exports = ReactStateSetters;
 
 /***/ },
 /* 161 */
@@ -18917,6 +19002,44 @@
 /* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule hyphenate
+	 * @typechecks
+	 */
+
+	var _uppercasePattern = /([A-Z])/g;
+
+	/**
+	 * Hyphenates a camelcased string, for example:
+	 *
+	 *   > hyphenate('backgroundColor')
+	 *   < "background-color"
+	 *
+	 * For CSS style names, use `hyphenateStyleName` instead which works properly
+	 * with all vendor prefixes, including `ms`.
+	 *
+	 * @param {string} string
+	 * @return {string}
+	 */
+	function hyphenate(string) {
+	  return string.replace(_uppercasePattern, "-$1").toLowerCase();
+	}
+
+	module.exports = hyphenate;
+
+/***/ },
+/* 164 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/* WEBPACK VAR INJECTION */(function(process) {/**
 	 * Copyright 2014, Facebook, Inc.
 	 * All rights reserved.
@@ -18979,7 +19102,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19011,44 +19134,6 @@
 	};
 
 	module.exports = forEachAccumulated;
-
-/***/ },
-/* 165 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule hyphenate
-	 * @typechecks
-	 */
-
-	var _uppercasePattern = /([A-Z])/g;
-
-	/**
-	 * Hyphenates a camelcased string, for example:
-	 *
-	 *   > hyphenate('backgroundColor')
-	 *   < "background-color"
-	 *
-	 * For CSS style names, use `hyphenateStyleName` instead which works properly
-	 * with all vendor prefixes, including `ms`.
-	 *
-	 * @param {string} string
-	 * @return {string}
-	 */
-	function hyphenate(string) {
-	  return string.replace(_uppercasePattern, "-$1").toLowerCase();
-	}
-
-	module.exports = hyphenate;
 
 /***/ },
 /* 166 */
@@ -19596,34 +19681,6 @@
 /* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule isNode
-	 * @typechecks
-	 */
-
-	/**
-	 * @param {*} object The object to check.
-	 * @return {boolean} Whether or not the object is a DOM node.
-	 */
-	function isNode(object) {
-	  return !!(object && (typeof Node === "function" ? object instanceof Node : typeof object === "object" && typeof object.nodeType === "number" && typeof object.nodeName === "string"));
-	}
-
-	module.exports = isNode;
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/**
 	 * Copyright 2013-2014, Facebook, Inc.
 	 * All rights reserved.
@@ -19647,6 +19704,34 @@
 	}
 
 	module.exports = performance || {};
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule isNode
+	 * @typechecks
+	 */
+
+	/**
+	 * @param {*} object The object to check.
+	 * @return {boolean} Whether or not the object is a DOM node.
+	 */
+	function isNode(object) {
+	  return !!(object && (typeof Node === "function" ? object instanceof Node : typeof object === "object" && typeof object.nodeType === "number" && typeof object.nodeName === "string"));
+	}
+
+	module.exports = isNode;
 
 /***/ },
 /* 173 */

@@ -51,7 +51,8 @@ export default React.createClass({
       return <ListPresItem key={item.id}
                            id={item.id}
                            title={item.title}
-                           img={item.img} />;
+                           img={item.img}
+                           favorite={item.favorite} />;
     }),
         emptyMessage = <p className="listPres-empty">
                           No any presentation
