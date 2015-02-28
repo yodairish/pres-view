@@ -8,23 +8,27 @@ var gulp = require('gulp'),
     csscomb = require('gulp-csscomb'),
     autoprefixer = require('autoprefixer-core'),
     csswring = require('csswring'),
+    customProperties = require('postcss-custom-properties'),
+    cssImport = require('postcss-import'),
+    filters = require('pleeease-filters'),
     postcss = require('gulp-postcss'),
+    concat = require('gulp-concat'),
     // js
     react = require('gulp-react'),
-    sass = require('gulp-sass'),
     jshint = require('gulp-jshint'),
     jscs = require('gulp-jscs'),
     webpack = require('gulp-webpack'),
     // CONSTANTS
-    SCSS_PATH = 'css',
+    CSS_PATH = 'css',
     JS_PATH = 'js',
     COMPONENT_PATH = 'components',
     PUBLIC_CSS = 'public/css',
     PUBLIC_JS = 'public/js',
-    JS_ENTRY_POINT = JS_PATH + '/main.js';
+    JS_ENTRY_POINT = JS_PATH + '/main.js',
+    IGNORE_JS_LINT = ['!**/helper.js'];
 
 /**
- * Linting SCSS files
+ * Linting CSS files
  * Possible send files to param -files=...
  */
 gulp.task('csslint', function() {
@@ -32,18 +36,18 @@ gulp.task('csslint', function() {
       stream,
       global,
       components;
-
+      
   if (files) {
     stream = gulp.src(files)
       .pipe(csscomb(__dirname + '/.csscomb.json'))
       .pipe(gulp.dest('./'));
 
   } else {
-    global = gulp.src(pf.scss(SCSS_PATH))
+    global = gulp.src(pf.css(CSS_PATH))
       .pipe(csscomb(__dirname + '/.csscomb.json'))
-      .pipe(gulp.dest(SCSS_PATH));
+      .pipe(gulp.dest(CSS_PATH));
 
-    components = gulp.src(pf.scss(COMPONENT_PATH))
+    components = gulp.src(pf.css(COMPONENT_PATH))
       .pipe(csscomb(__dirname + '/.csscomb.json'))
       .pipe(gulp.dest(COMPONENT_PATH));
 
@@ -54,23 +58,26 @@ gulp.task('csslint', function() {
 });
 
 /**
- * Processing SCSS files
+ * Processing CSS files
  */
 gulp.task('css', ['csslint'], function() {
   var processors = [
+    cssImport(),
+    customProperties(),
     autoprefixer({
       browsers: ['last 1 version']
     }),
+    filters(),
     csswring({
       removeAllComments: true
     })
   ];
 
-  return gulp.src([pf.scss(SCSS_PATH), pf.scss(COMPONENT_PATH)])
+  return gulp.src([pf.css(CSS_PATH), pf.css(COMPONENT_PATH)])
     .pipe(sourcemaps.init())
-    .pipe(sass())
     .pipe(postcss(processors))
-    .pipe(sourcemaps.write(PUBLIC_CSS + '/map'))
+    .pipe(concat('style.css'))
+    .pipe(sourcemaps.write('map'))
     .pipe(gulp.dest(PUBLIC_CSS));
 });
 
@@ -84,6 +91,8 @@ gulp.task('jslint', function() {
   if (!files) {
     files = [pf.js(JS_PATH), pf.js(COMPONENT_PATH)];
   }
+  
+  files = files.concat(IGNORE_JS_LINT);
 
   return gulp.src(files)
     .pipe(jscs()).on('error', errorHandler)

@@ -5,6 +5,7 @@ jest.dontMock('../ListPres.js');
 
 import React from 'react/addons';
 import PresListStore from '../../../../js/stores/PresListStore.js';
+import PresListActions from '../../../../js/actions/PresListActions.js';
 import ListPresItem from '../ListPresItem/ListPresItem.js';
 import ListPres from '../ListPres.js';
 
@@ -22,7 +23,8 @@ describe('List Pres component', () => {
     }];
     
     PresListStore.getAll.mockReturnValue(list);
-    PresListStore.addNextPartListener.mockClear();
+    PresListStore.addChangeListener.mockClear();
+    PresListActions.loadMore.mockClear();
     
     listPres = TestUtils.renderIntoDocument(
       <ListPres />
@@ -39,6 +41,10 @@ describe('List Pres component', () => {
     expect(items[0].props.id).toBe(11);
   });
   
+  it('Call for new items when initialize', () => {
+    expect(PresListActions.loadMore.mock.calls.length).toBe(1);
+  });
+  
   it('Update list after getting a new part', () => {
     var items;
     
@@ -46,7 +52,7 @@ describe('List Pres component', () => {
       id: 33
     });
     
-    PresListStore.addNextPartListener.mock.calls[0][0]();
+    PresListStore.addChangeListener.mock.calls[0][0]();
     
     items = TestUtils.scryRenderedComponentsWithType(
       listPres,
@@ -65,7 +71,7 @@ describe('List Pres component', () => {
     expect(message.length).toBe(0);
     
     PresListStore.getAll.mockReturnValue([]);
-    PresListStore.addNextPartListener.mock.calls[0][0]();
+    PresListStore.addChangeListener.mock.calls[0][0]();
     
     message = TestUtils.scryRenderedDOMComponentsWithClass(
       listPres,

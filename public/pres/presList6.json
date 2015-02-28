@@ -1,0 +1,22 @@
+[
+  {
+    "id": 8,
+    "img": "./pres/images/pres.jpg",
+    "title": "some title 77"
+  },
+  {
+    "id": 25,
+    "img": "./pres/images/pres.jpg",
+    "title": "some title 88"
+  },
+  {
+    "id": 17,
+    "img": "./pres/images/pres.jpg",
+    "title": "some title 99"
+  },
+  {
+    "id": 18,
+    "img": "./pres/images/pres.jpg",
+    "title": "some title 100"
+  }
+]

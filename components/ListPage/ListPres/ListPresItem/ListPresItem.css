@@ -1,0 +1,37 @@
+.listPresItem {
+  max-width: 320px;
+  min-height: 240px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.listPresItem:hover {
+  cursor: pointer;
+  box-shadow: 0 1px 4px #99e;
+}
+
+.listPresItem-img {
+  height: 200px;
+  overflow: hidden;
+
+  filter: grayscale(1);
+}
+
+.listPresItem:hover .listPresItem-img {
+  filter: grayscale(0);
+}
+
+.listPresItem-img img {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+
+  max-width: 100%;
+}
+
+.listPresItem-title {
+  min-height: 40px;
+
+  line-height: 40px;
+  text-align: center;
+}

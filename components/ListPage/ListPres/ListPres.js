@@ -2,6 +2,7 @@
 
 import React from 'react';
 import PresListStore from '../../../js/stores/PresListStore.js';
+import PresListActions from '../../../js/actions/PresListActions.js';
 import ListPresItem from './ListPresItem/ListPresItem.js';
 import LoadMore from './LoadMore/LoadMore.js';
 
@@ -10,6 +11,8 @@ export default React.createClass({
    * Set default state
    */
   getInitialState() {
+    PresListActions.loadMore();
+    
     return {
       items: PresListStore.getAll()
     };
@@ -60,7 +63,9 @@ export default React.createClass({
     
     return (
       <div className="listPres">
-        {items}
+        <div className="listPres-list">
+          {items}
+        </div>
         {emptyMessage}
         <LoadMore />
       </div>

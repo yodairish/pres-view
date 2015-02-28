@@ -1,0 +1,12 @@
+.listPres-list {
+  display: flex;
+
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+.listPres-empty {
+  padding: 20px;
+
+  text-align: center;
+}

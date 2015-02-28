@@ -20,14 +20,17 @@ export default React.createClass({
   render() {
     var cx = React.addons.classSet,
         favoritesClasses = cx({
-          'menu-favorites': true,
-          'menu-favorites--active': this.state.favorites
+          'menu-button': true,
+          'favorites--active': this.state.favorites
         });
     
     return (
       <div className="menu">
-        <button className={favoritesClasses}
-                onClick={this.showFavorites}></button>
+        <span className={favoritesClasses}
+                onClick={this.showFavorites}>
+          <span className="favorites-star"></span>
+          <span className="favorites-star"></span>
+        </span>
       </div>
     );
   },

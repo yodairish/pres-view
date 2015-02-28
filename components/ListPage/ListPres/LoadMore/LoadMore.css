@@ -1,0 +1,73 @@
+.loadMore {
+  margin-bottom: 50px;
+
+  text-align: center;
+}
+
+.loadMore-button {
+  padding: 11px 70px;
+  border: 1px solid #888;
+
+  background-color: #fff;
+
+  cursor: pointer;
+  transition: box-shadow .2s;
+}
+
+.loadMore-button:hover {
+  box-shadow: 0 2px 6px #66a;
+}
+
+.loadMore-spinner {
+  position: relative;
+
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+}
+
+
+.loadMore-spinner:before {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  content: '';
+  opacity: .5;
+}
+
+.loadMore-spinner:after {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 30px;
+  height: 30px;
+  margin: auto;
+  border: 3px solid;
+  border-radius: 50%;
+
+  border-top-color: #4652e0;
+  border-right-color: #2bac2b;
+  border-bottom-color: #cab831;
+  border-left-color: #e25454;
+
+  content: '';
+  animation: spinningAnim linear 1s 0 infinite;
+}
+
+@keyframes spinningAnim {
+  0% {
+    transform: translateZ(0) rotateZ(0deg);
+  }
+
+  100% {
+    transform: translateZ(0) rotateZ(360deg);
+  }
+}

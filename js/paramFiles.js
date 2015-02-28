@@ -29,12 +29,12 @@ exports.paramFiles = function paramFiles() {
 };
 
 /**
- * Get path to scss files
+ * Get path to css files
  * @param {String} path
  * @return {String}
  */
-exports.scss = function scss(path) {
-  return filesFromPath(path, 'scss');
+exports.css = function css(path) {
+  return filesFromPath(path, 'css');
 };
 
 /**
