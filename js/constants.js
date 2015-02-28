@@ -3,10 +3,11 @@
 import keyMirror from 'keymirror';
 
 const ACTIONS_PRES_LIST = keyMirror({
+                            LOADING: null,
                             LOAD_MORE: null,
                             FAVORITES: null,
-                            GET_MEW_ITEMS: null,
-                            GET_MEW_ITEMS_ERROR: null,
+                            GET_NEW_ITEMS: null,
+                            GET_NEW_ITEMS_ERROR: null,
                             TOGGLE_FAVORITE: null
                           }),
       ACTIONS_PRES_VIEW = keyMirror({

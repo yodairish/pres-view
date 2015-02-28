@@ -8,7 +8,8 @@ describe('Store for presentations list', () => {
   var appDispatcher,
       PresListStore,
       loader,
-      callback;
+      callback,
+      loadingCallback;
   
   beforeEach(() => {
     appDispatcher = require('../../dispatcher/appDispatcher.js');
@@ -16,6 +17,13 @@ describe('Store for presentations list', () => {
     loader = require('../../utils/loader.js');
     
     callback = appDispatcher.register.mock.calls[0][0];
+    
+    loadingCallback = jest.genMockFn();
+    PresListStore.addLoadingListener(loadingCallback);
+  });
+  
+  afterEach(() => {
+    PresListStore.removeLoadingListener(loadingCallback);
   });
   
   it('register a callback with the dispatcher', () => {
@@ -30,18 +38,27 @@ describe('Store for presentations list', () => {
   
   it('Add new items to the list', () => {
     callback({
-      type: ACTIONS_PRES_LIST.GET_MEW_ITEMS,
+      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS,
       items: [{}, {}]
     });
     
     var items = PresListStore.getAll();
     
+    expect(loadingCallback.mock.calls[0][0]).toBeFalsy();
     expect(items.length).toBe(2);
+  });
+  
+  it('If error until getting new items, update loading status', () => {
+    callback({
+      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS_ERROR
+    });
+    
+    expect(loadingCallback.mock.calls[0][0]).toBeFalsy();
   });
   
   it('Show only favorites', () => {
     callback({
-      type: ACTIONS_PRES_LIST.GET_MEW_ITEMS,
+      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS,
       items: [{}, {
         favorite: true
       }]
@@ -59,7 +76,7 @@ describe('Store for presentations list', () => {
   
   it('Load more items', () => {
     callback({
-      type: ACTIONS_PRES_LIST.GET_MEW_ITEMS,
+      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS,
       items: [{}]
     });
     
@@ -67,6 +84,7 @@ describe('Store for presentations list', () => {
       type: ACTIONS_PRES_LIST.LOAD_MORE
     });
 
+    expect(loadingCallback.mock.calls[1][0]).toBeTruthy();
     expect(loader.getNextItems.mock.calls[0][0]).toBe(1);
   });
   
@@ -75,7 +93,7 @@ describe('Store for presentations list', () => {
         items;
     
     callback({
-      type: ACTIONS_PRES_LIST.GET_MEW_ITEMS,
+      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS,
       items: [{
         id: id
       }]

@@ -6,6 +6,7 @@ import appDispatcher from '../dispatcher/appDispatcher.js';
 import loader from '../utils/loader.js';
 
 var favoritesActive = false,
+    loading = false,
     presentations = [],
     PresListStore;
     
@@ -26,11 +27,34 @@ PresListStore = Object.assign({}, EventEmitter.prototype, {
   },
   
   /**
-   * Remove listener for updating the presentations list
+   * Remove listener from updating the presentations list
    * @param {function} callback
    */
   removeChangeListener(callback) {
     this.removeListener(STORES_PRES_LIST.CHANGE, callback);
+  },
+  
+  /**
+   * Call all loading callbacks
+   */
+  emitLoading() {
+    this.emit(STORES_PRES_LIST.LOADING, loading);
+  },
+  
+  /**
+   * Add new listener for change loading status
+   * @param {function} callback
+   */
+  addLoadingListener(callback) {
+    this.on(STORES_PRES_LIST.LOADING, callback);
+  },
+  
+  /**
+   * Remove listener from change loading status
+   * @param {function} callback
+   */
+  removeLoadingListener(callback) {
+    this.removeListener(STORES_PRES_LIST.LOADING, callback);
   },
   
   /**
@@ -69,13 +93,23 @@ PresListStore = Object.assign({}, EventEmitter.prototype, {
 PresListStore.dispatchToken = appDispatcher.register((action) => {
   switch (action.type) {
     case ACTIONS_PRES_LIST.LOAD_MORE: {
+      loading = true;
+      PresListStore.emitLoading();
       loader.getNextItems(PresListStore.getCount());
       break;
     }
-    case ACTIONS_PRES_LIST.GET_MEW_ITEMS: {
+    case ACTIONS_PRES_LIST.GET_NEW_ITEMS: {
       presentations = presentations.concat(action.items);
       
       PresListStore.emitChange();
+      
+      loading = false;
+      PresListStore.emitLoading();
+      break;
+    }
+    case ACTIONS_PRES_LIST.GET_NEW_ITEMS_ERROR: {
+      loading = false;
+      PresListStore.emitLoading();
       break;
     }
     case ACTIONS_PRES_LIST.FAVORITES: {

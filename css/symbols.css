@@ -1,3 +1,5 @@
+@import './variables/zIndex.css';
+
 /**
  *  Border favorite star
  */
@@ -92,4 +94,62 @@
 .favorites--active .favorites-star:last-child:before,
 .favorites--active .favorites-star:last-child:after {
   border-bottom-color: #f00;
+}
+
+/**
+ *  Spinner
+ */
+
+.spinner {
+  position: relative;
+
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+}
+
+
+.spinner:before {
+  position: absolute;
+  z-index: var(--zIndex-2);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  content: '';
+  opacity: .5;
+}
+
+.spinner:after {
+  position: absolute;
+  z-index: var(--zIndex-3);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 30px;
+  height: 30px;
+  margin: auto;
+  border: 3px solid;
+  border-radius: 50%;
+
+  border-top-color: #4652e0;
+  border-right-color: #2bac2b;
+  border-bottom-color: #cab831;
+  border-left-color: #e25454;
+
+  content: '';
+  animation: spinningAnim linear 1s 0 infinite;;
+}
+
+@keyframes spinningAnim {
+  0% {
+    transform: translateZ(0) rotateZ(0deg);
+  }
+
+  100% {
+    transform: translateZ(0) rotateZ(360deg);
+  }
 }

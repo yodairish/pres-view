@@ -1,3 +1,5 @@
+@import '../../../../css/variables/zIndex.css';
+
 .listPresItem {
   position: relative;
 
@@ -40,7 +42,7 @@
 
 .listPresItem-favorite {
   position: absolute;
-  z-index: 200;
+  z-index: var(--zIndex-3);
   top: 10px;
   right: 10px;
 

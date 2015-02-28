@@ -12,10 +12,11 @@ var TestUtils = React.addons.TestUtils;
 describe('LoadMore Component', () => {
   var loadMore,
       button,
-      spinner;
+      spinner,
+      loadingCallback;
       
   beforeEach(() => {
-    PresListStore.addChangeListener.mockClear();
+    PresListStore.addLoadingListener.mockClear();
     PresListActions.loadMore.mockClear();
     
     loadMore = TestUtils.renderIntoDocument(
@@ -29,8 +30,10 @@ describe('LoadMore Component', () => {
 
     spinner = TestUtils.findRenderedDOMComponentWithClass(
                 loadMore,
-                'loadMore-spinner'
+                'spinner'
               ).getDOMNode();
+              
+    loadingCallback = PresListStore.addLoadingListener.mock.calls[0][0];
   });
   
   it('Show spinner on click and call load more action', () => {
@@ -39,6 +42,7 @@ describe('LoadMore Component', () => {
     expect(PresListActions.loadMore.mock.calls.length).toBe(0);
     
     TestUtils.Simulate.click(button);
+    loadingCallback(true);
     
     expect(button.className).toContain('hidden');
     expect(spinner.className).not.toContain('hidden');
@@ -46,12 +50,10 @@ describe('LoadMore Component', () => {
   });
   
   it('When store get new part return to default state', function() {
-    TestUtils.Simulate.click(button);
-    
+    loadingCallback(true);
     expect(loadMore.state.loading).toBeTruthy();
     
-    PresListStore.addChangeListener.mock.calls[0][0]();
-    
+    loadingCallback(false);
     expect(loadMore.state.loading).toBeFalsy();
   });
 });

@@ -1,6 +1,8 @@
+@import '../../../css/variables/zIndex.css';
+
 .menu {
   position: fixed;
-  z-index: 500;
+  z-index: var(--zIndex-6);
   top: 0;
 
   width: 100%;

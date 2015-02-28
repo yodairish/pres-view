@@ -30,7 +30,7 @@ export default {
    */
   getNewItems(items) {
     appDispatcher.dispatch({
-      type: ACTIONS_PRES_LIST.GET_MEW_ITEMS,
+      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS,
       items: items
     });
   },
@@ -41,7 +41,7 @@ export default {
    */
   getNewItemsError(error) {
     appDispatcher.dispatch({
-      type: ACTIONS_PRES_LIST.GET_MEW_ITEMS_ERROR,
+      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS_ERROR,
       error: error
     });
   },

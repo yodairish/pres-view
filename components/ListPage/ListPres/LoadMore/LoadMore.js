@@ -19,7 +19,7 @@ export default React.createClass({
    * Start listening getting next part items of list
    */
   componentDidMount() {
-    PresListStore.addChangeListener(this.onNextPart);
+    PresListStore.addLoadingListener(this.onChangeLoading);
   },
   
   /**
@@ -27,7 +27,7 @@ export default React.createClass({
    * Stop listening getting next part items of list
    */
   componentWillUnmount() {
-    PresListStore.removeChangeListener(this.onNextPart);
+    PresListStore.removeLoadingListener(this.onChangeLoading);
   },
   
   /**
@@ -40,7 +40,7 @@ export default React.createClass({
           hidden: this.state.loading
         }),
         loaderClasses = cx({
-          'loadMore-spinner': true,
+          spinner: true,
           hidden: !this.state.loading
         });
     
@@ -56,9 +56,9 @@ export default React.createClass({
   /**
    * After loading next part turn off spinner
    */
-  onNextPart() {
+  onChangeLoading(status) {
     this.setState({
-      loading: false
+      loading: status
     });
   },
   
@@ -66,10 +66,6 @@ export default React.createClass({
    * Show spinner and send request for getting new part
    */
   onClick() {
-    this.setState({
-      loading: true
-    });
-    
     PresListActions.loadMore();
   }
 });
