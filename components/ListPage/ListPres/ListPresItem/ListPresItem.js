@@ -42,7 +42,6 @@ export default React.createClass({
         <span className={favoritesClasses}
               onClick={this.addToFavorites}>
           <span className="favorites-star"></span>
-          <span className="favorites-star"></span>
         </span>
         <div className="listPresItem-img">
           <img src={this.props.img}

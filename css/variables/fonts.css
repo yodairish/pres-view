@@ -1,3 +1,5 @@
+@import './colors.css';
+
 :root {
   /**
     *  Family
@@ -116,6 +118,14 @@
 
 @define-mixin font-button {
   color: var(--fontColor-button);
+
+  font-family: var(--fontFamily-button);
+  font-size: var(--fontSize-button);
+  text-transform: uppercase;
+}
+
+@define-mixin font-button-filled {
+  color: var(--color-blank);
 
   font-family: var(--fontFamily-button);
   font-size: var(--fontSize-button);

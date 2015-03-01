@@ -29,7 +29,6 @@ export default React.createClass({
         <span className={favoritesClasses}
               onClick={this.showFavorites}>
           <span className="favorites-star"></span>
-          <span className="favorites-star"></span>
         </span>
       </div>
     );

@@ -1,20 +1,21 @@
 @import './variables/zIndex.css';
+@import './variables/colors.css';
 
 /**
  *  Border favorite star
  */
 
-.favorites-star:first-child,
-.favorites-star:first-child:before,
-.favorites-star:first-child:after {
+.favorites-star,
+.favorites-star:before,
+.favorites-star:after {
   width: 0;
   height: 0;
   border-right: 10px solid transparent;
-  border-bottom: 7px solid #888;
+  border-bottom: 7px solid var(--color-blank);
   border-left: 10px solid transparent;
 }
 
-.favorites-star:first-child {
+.favorites-star {
   position: absolute;
   top: 0;
   right: 0;
@@ -25,7 +26,7 @@
   margin: auto;
 }
 
-.favorites-star:first-child:before {
+.favorites-star:before {
   transform: rotateZ(-70deg) translate(-4px, -10px);
 
   display: block;
@@ -33,50 +34,7 @@
   content: '';
 }
 
-.favorites-star:first-child:after {
-  transform: rotateZ(-35deg) translate(1px, -13px);
-
-  display: block;
-  border-right: 3px solid transparent;
-  border-left: 3px solid transparent;
-
-  content: '';
-}
-
-/**
- *  Fill favorite star
- */
-
-.favorites-star:last-child,
-.favorites-star:last-child:before,
-.favorites-star:last-child:after {
-  width: 0;
-  height: 0;
-  border-right: 10px solid transparent;
-  border-bottom: 7px solid #fff;
-  border-left: 10px solid transparent;
-}
-
-.favorites-star:last-child {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  transform: rotateZ(35deg) scale(.7);
-
-  margin: auto;
-}
-
-.favorites-star:last-child:before {
-  transform: rotateZ(-70deg) translate(-4px, -10px);
-
-  display: block;
-
-  content: '';
-}
-
-.favorites-star:last-child:after {
+.favorites-star:after {
   transform: rotateZ(-35deg) translate(1px, -13px);
 
   display: block;
@@ -90,10 +48,10 @@
  *  Active favorites
  */
 
-.favorites--active .favorites-star:last-child,
-.favorites--active .favorites-star:last-child:before,
-.favorites--active .favorites-star:last-child:after {
-  border-bottom-color: #f00;
+.favorites--active .favorites-star,
+.favorites--active .favorites-star:before,
+.favorites--active .favorites-star:after {
+  border-bottom-color: var(--color-secondary);
 }
 
 /**

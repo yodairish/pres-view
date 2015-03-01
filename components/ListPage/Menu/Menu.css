@@ -1,4 +1,5 @@
 @import '../../../css/variables/zIndex.css';
+@import '../../../css/variables/colors.css';
 
 .menu {
   position: fixed;
@@ -9,11 +10,11 @@
   height: 40px;
   padding: 5px 0;
 
-  background-color: #fff;
+  background-color: var(--color-primary);
 
   text-align: right;
 
-  box-shadow: 0 1px 5px #999;
+  box-shadow: 0 1px 5px var(--color-shadow);
 }
 
 .menu-button {
@@ -23,15 +24,19 @@
   width: 40px;
   height: 40px;
   margin-right: 10px;
-  /*border: 1px solid #888;*/
-  /*border: none;*/
+  border-radius: 50%;
 
-  background-color: #fff;
+  background-color: var(--color-secondary);
 
   cursor: pointer;
+  box-shadow: 0 1px 5px var(--color-shadow);
   transition: box-shadow .2s;
 }
 
-/*.menu-button:hover {*/
-/*  box-shadow: 0 2px 6px #66a;*/
-/*}*/
+.menu-button.favorites--active {
+  background-color: var(--color-secondary-light);
+}
+
+.menu-button:hover {
+  box-shadow: 0 2px 6px var(--color-shadow);
+}
