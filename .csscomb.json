@@ -28,6 +28,10 @@
   "unitless-zero": true,
   "sort-order": [
     [
+      "$include"
+    ],
+    
+    [
       "position",
       "z-index",
       "top",

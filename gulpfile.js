@@ -10,6 +10,7 @@ var gulp = require('gulp'),
     csswring = require('csswring'),
     customProperties = require('postcss-custom-properties'),
     cssImport = require('postcss-import'),
+    mixins = require('postcss-mixins'),
     filters = require('pleeease-filters'),
     postcss = require('gulp-postcss'),
     concat = require('gulp-concat'),
@@ -64,6 +65,7 @@ gulp.task('css', ['csslint'], function() {
   var processors = [
     cssImport(),
     customProperties(),
+    mixins(),
     autoprefixer({
       browsers: ['last 1 version']
     }),

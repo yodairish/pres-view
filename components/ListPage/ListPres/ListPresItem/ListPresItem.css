@@ -1,4 +1,5 @@
 @import '../../../../css/variables/zIndex.css';
+@import '../../../../css/variables/fonts.css';
 
 .listPresItem {
   position: relative;
@@ -38,6 +39,7 @@
 
   line-height: 40px;
   text-align: center;
+  @mixin font-body-1;
 }
 
 .listPresItem-favorite {

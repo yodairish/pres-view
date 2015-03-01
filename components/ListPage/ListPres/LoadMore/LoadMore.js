@@ -47,7 +47,7 @@ export default React.createClass({
     return (
       <div className="loadMore">
         <button className={buttonClasses}
-                onClick={this.onClick}>Load More</button>
+                onClick={this.onClick}>LOAD MORE</button>
         <span className={loaderClasses}></span>
       </div>
     );

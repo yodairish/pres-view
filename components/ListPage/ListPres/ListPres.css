@@ -1,3 +1,5 @@
+@import '../../../css/variables/fonts.css';
+
 .listPres-list {
   display: flex;
 
@@ -9,4 +11,5 @@
   padding: 20px;
 
   text-align: center;
+  @mixin font-body-1;
 }
