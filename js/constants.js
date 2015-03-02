@@ -11,14 +11,20 @@ const ACTIONS_PRES_LIST = keyMirror({
                             TOGGLE_FAVORITE: null
                           }),
       ACTIONS_PRES_VIEW = keyMirror({
-                            OPEN: null
+                            OPEN: null,
+                            SHOW_SLIDE: null,
+                            GET_SLIDES: null
                           }),
       STORES_PRES_LIST = keyMirror({
                             CHANGE: null
+                          }),
+      STORES_PRES_VIEW = keyMirror({
+                            PROGRESS: null
                           });
 
 export default {
   ACTIONS_PRES_LIST: ACTIONS_PRES_LIST,
   ACTIONS_PRES_VIEW: ACTIONS_PRES_VIEW,
-  STORES_PRES_LIST: STORES_PRES_LIST
+  STORES_PRES_LIST: STORES_PRES_LIST,
+  STORES_PRES_VIEW: STORES_PRES_VIEW
 };

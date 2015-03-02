@@ -11,6 +11,11 @@ var favoritesActive = false,
     PresListStore;
     
 PresListStore = Object.assign({}, EventEmitter.prototype, {
+  
+  /**
+   * ============ CHANGE EVENTS ============
+   */
+  
   /**
    * Call all change callbacks
    */
@@ -34,6 +39,12 @@ PresListStore = Object.assign({}, EventEmitter.prototype, {
     this.removeListener(STORES_PRES_LIST.CHANGE, callback);
   },
   
+  // ========================================
+  
+  /**
+   * ============ LOADING EVENTS ============
+   */
+  
   /**
    * Call all loading callbacks
    */
@@ -56,6 +67,8 @@ PresListStore = Object.assign({}, EventEmitter.prototype, {
   removeLoadingListener(callback) {
     this.removeListener(STORES_PRES_LIST.LOADING, callback);
   },
+  
+  // ========================================
   
   /**
    * Return all available presentations

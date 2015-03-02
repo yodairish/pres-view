@@ -14,17 +14,6 @@ export default {
   },
   
   /**
-   * Create action for showing only favorites
-   * @param {boolean} active
-   */
-  showFavorites(active) {
-    appDispatcher.dispatch({
-      type: ACTIONS_PRES_LIST.FAVORITES,
-      active: active
-    });
-  },
-  
-  /**
    * Create action for getting new items
    * @param {array} items
    */
@@ -43,6 +32,17 @@ export default {
     appDispatcher.dispatch({
       type: ACTIONS_PRES_LIST.GET_NEW_ITEMS_ERROR,
       error: error
+    });
+  },
+  
+  /**
+   * Create action for showing only favorites
+   * @param {boolean} active
+   */
+  showFavorites(active) {
+    appDispatcher.dispatch({
+      type: ACTIONS_PRES_LIST.FAVORITES,
+      active: active
     });
   },
   

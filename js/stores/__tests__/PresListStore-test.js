@@ -9,6 +9,7 @@ describe('Store for presentations list', () => {
       PresListStore,
       loader,
       callback,
+      changeCallback,
       loadingCallback;
   
   beforeEach(() => {
@@ -18,15 +19,18 @@ describe('Store for presentations list', () => {
     
     callback = appDispatcher.register.mock.calls[0][0];
     
+    changeCallback = jest.genMockFn();
     loadingCallback = jest.genMockFn();
+    PresListStore.addChangeListener(changeCallback);
     PresListStore.addLoadingListener(loadingCallback);
   });
   
   afterEach(() => {
+    PresListStore.addChangeListener(changeCallback);
     PresListStore.removeLoadingListener(loadingCallback);
   });
   
-  it('register a callback with the dispatcher', () => {
+  it('Register a callback with the dispatcher', () => {
     expect(appDispatcher.register.mock.calls.length).toBe(1);
   });
   
@@ -44,6 +48,7 @@ describe('Store for presentations list', () => {
     
     var items = PresListStore.getAll();
     
+    expect(changeCallback.mock.calls.length).toBe(1);
     expect(loadingCallback.mock.calls[0][0]).toBeFalsy();
     expect(items.length).toBe(2);
   });
@@ -71,6 +76,7 @@ describe('Store for presentations list', () => {
     
     var items = PresListStore.getAll();
     
+    expect(changeCallback.mock.calls.length).toBe(2);
     expect(items.length).toBe(1);
   });
   
@@ -106,6 +112,7 @@ describe('Store for presentations list', () => {
     
     items = PresListStore.getAll();
 
+    expect(changeCallback.mock.calls.length).toBe(2);
     expect(items[0].favorite).toBeTruthy();
   });
 });

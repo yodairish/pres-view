@@ -20,6 +20,30 @@ describe('Action creator for presentations list', () => {
     expect(action.type).toBe(ACTIONS_PRES_LIST.LOAD_MORE);
   });
   
+  it('Action for get new items', () => {
+    var items = [{}, {}],
+        action;
+    
+    PresListActions.getNewItems(items);
+    
+    action = appDispatcher.dispatch.mock.calls[0][0];
+    
+    expect(action.type).toBe(ACTIONS_PRES_LIST.GET_NEW_ITEMS);
+    expect(action.items).toEqual(items);
+  });
+  
+  it('Action for error until getting new items', () => {
+    var error = {},
+        action;
+    
+    PresListActions.getNewItemsError(error);
+    
+    action = appDispatcher.dispatch.mock.calls[0][0];
+    
+    expect(action.type).toBe(ACTIONS_PRES_LIST.GET_NEW_ITEMS_ERROR);
+    expect(action.error).toEqual(error);
+  });
+  
   it('Show favorites action', () => {
     var action;
     
@@ -38,7 +62,7 @@ describe('Action creator for presentations list', () => {
     expect(action.active).toBeFalsy();
   });
   
-  it('Toggle favorite status for item', () => {
+  it('Action for toggle favorite status for item', () => {
     var id = 123,
         action;
     
