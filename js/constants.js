@@ -19,7 +19,9 @@ const ACTIONS_PRES_LIST = keyMirror({
                             CHANGE: null
                           }),
       STORES_PRES_VIEW = keyMirror({
-                            PROGRESS: null
+                            SLIDE_LIST: null,
+                            PROGRESS: null,
+                            CURRENT_SLIDE: null
                           });
 
 export default {

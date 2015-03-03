@@ -9,6 +9,35 @@ var slides = [],
 
 var PresViewStore = Object.assign({}, EventEmitter.prototype, {
   /**
+   * ============ SLIDES LIST EVENTS ============
+   */
+   
+  /**
+   * Call all slide list changes callbacks
+   */
+  emitSlideList() {
+    this.emit(STORES_PRES_VIEW.SLIDE_LIST);
+  },
+
+  /**
+   * Add new listener for changing slide list
+   * @param {function} callback
+   */
+  addSlideListListener(callback) {
+    this.on(STORES_PRES_VIEW.SLIDE_LIST, callback);
+  },
+  
+  /**
+   * Remove listener for changing slide list
+   * @param {function} callback
+   */
+  removeSlideListListener(callback) {
+    this.removeListener(STORES_PRES_VIEW.SLIDE_LIST, callback);
+  },
+  
+  // ========================================
+  
+  /**
    * ============ PROGRESS EVENTS ============
    */
   
@@ -35,6 +64,45 @@ var PresViewStore = Object.assign({}, EventEmitter.prototype, {
     this.removeListener(STORES_PRES_VIEW.PROGRESS, callback);
   },
   
+  // ========================================
+  
+  /**
+   * ============ CURRENT SLIDE EVENTS ============
+   */
+  
+  /**
+   * call all changing current slide callbacks
+   */
+  emitCurrentSlide() {
+    this.emit(STORES_PRES_VIEW.CURRENT_SLIDE, currentSlide);
+  },
+
+  /**
+   * Add new listener for changing current slide
+   * @param {function} callback
+   */
+  addCurrentSlideListener(callback) {
+    this.on(STORES_PRES_VIEW.CURRENT_SLIDE, callback);
+  },
+  
+  /**
+   * Remove listener for changing current slide
+   * @param {function} callback
+   */
+  removeCurrentSlideListener(callback) {
+    this.removeListener(STORES_PRES_VIEW.CURRENT_SLIDE, callback);
+  },
+  
+  // ========================================
+  
+  /**
+   * Get all slides
+   * @return {array}
+   */
+  getSlides() {
+    return slides;
+  },
+  
   /**
    * Get count of slides
    * @returns {number}
@@ -48,12 +116,18 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
   switch(action.type) {
     case ACTIONS_PRES_VIEW.GET_SLIDES: {
       slides = action.slides;
+      currentSlide = 0;
+      
+      PresViewStore.emitSlideList();
+      PresViewStore.emitCurrentSlide();
+      PresViewStore.emitProgress();
       break;
     }
     case ACTIONS_PRES_VIEW.SHOW_SLIDE: {
       if (isValidSlide(action.slideNumber)) {
         currentSlide = action.slideNumber;
       
+        PresViewStore.emitCurrentSlide();
         PresViewStore.emitProgress();
       }
       
