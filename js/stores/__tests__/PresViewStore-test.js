@@ -81,4 +81,15 @@ describe('Store for view presentation', () => {
     expect(currentSlideCallback.mock.calls[1][0]).toBe(2);
     expect(progressCallback.mock.calls[1][0]).toBe(75);
   });
+  
+  it('Update id when open new presentation', () => {
+    var id = 5;
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.OPEN,
+      id: id
+    });
+    
+    expect(PresViewStore.getId()).toBe(id);
+  });
 });

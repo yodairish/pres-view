@@ -20,8 +20,8 @@ export default React.createClass({
   render() {
     var cx = React.addons.classSet,
         favoritesClasses = cx({
-          'menu-button': true,
-          'favorites--active': this.state.favorites
+          'control-button': true,
+          'control--active': this.state.favorites
         });
     
     return (

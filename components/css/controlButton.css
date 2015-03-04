@@ -1,0 +1,25 @@
+@import '../../css/variables/colors.css';
+
+.control-button {
+  position: relative;
+
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  border-radius: 50%;
+
+  background-color: var(--color-secondary);
+
+  cursor: pointer;
+  box-shadow: 0 1px 5px var(--color-shadow);
+  transition: box-shadow .2s;
+}
+
+.control-button:hover {
+  box-shadow: 0 2px 6px var(--color-shadow);
+}
+
+.control-button.control--active {
+  background-color: var(--color-secondary-light);
+}

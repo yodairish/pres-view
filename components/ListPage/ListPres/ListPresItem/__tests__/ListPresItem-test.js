@@ -14,9 +14,12 @@ describe('ListPresItem component', () => {
       listPresItem;
   
   beforeEach(() => {
+    ViewPresActions.open.mockClear();
+    PresListActions.toggleFavoriteStatus.mockClear();
+    
     listPresItem = TestUtils.renderIntoDocument(
-       <ListPresItem id={id} />
-     );
+      <ListPresItem id={id} />
+    );
   });
   
   it('Open picked presentation', () => {
@@ -36,5 +39,26 @@ describe('ListPresItem component', () => {
     TestUtils.Simulate.click(toFavorite);
         
     expect(PresListActions.toggleFavoriteStatus.mock.calls[0][0]).toBe(id);
+  });
+  
+  it('Created with choosen favorite status', () => {
+    var toFavorite = TestUtils.findRenderedDOMComponentWithClass(
+          listPresItem,
+          'listPresItem-favorite'
+        ).getDOMNode();
+        
+    expect(toFavorite.className).not.toContain('control--active');
+    
+    listPresItem = TestUtils.renderIntoDocument(
+      <ListPresItem id={id}
+                    favorite/>
+    );
+    
+    toFavorite = TestUtils.findRenderedDOMComponentWithClass(
+      listPresItem,
+      'listPresItem-favorite'
+    ).getDOMNode();
+        
+    expect(toFavorite.className).toContain('control--active');
   });
 });

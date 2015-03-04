@@ -18,7 +18,7 @@ describe('Menu component', function() {
     
     return TestUtils.findRenderedDOMComponentWithClass(
       menu,
-      'menu-favorites'
+      'control-button'
     ).getDOMNode();
   }
   
@@ -27,11 +27,11 @@ describe('Menu component', function() {
     
     PresListStore.isFavorites.mockReturnValue(false);
     favorites = getFavorites();
-    expect(favorites.className).not.toContain('menu-favorites--active');
+    expect(favorites.className).not.toContain('control--active');
     
     PresListStore.isFavorites.mockReturnValue(true);
     favorites = getFavorites();
-    expect(favorites.className).toContain('menu-favorites--active');
+    expect(favorites.className).toContain('control--active');
   });
   
   it('Favorites button call update status favorite list on/off', () => {
@@ -40,11 +40,11 @@ describe('Menu component', function() {
     
     var favorites = getFavorites();
     
-    expect(favorites.className).not.toContain('menu-favorites--active');
+    expect(favorites.className).not.toContain('control--active');
     
     TestUtils.Simulate.click(favorites);
     
-    expect(favorites.className).toContain('menu-favorites--active');
+    expect(favorites.className).toContain('control--active');
     expect(PresListActions.showFavorites.mock.calls[0][0]).toBeTruthy();
   });
 });

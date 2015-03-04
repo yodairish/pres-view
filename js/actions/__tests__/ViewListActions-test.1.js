@@ -13,11 +13,23 @@ describe('Action creator for presentation view', () => {
   });
   
   it('Open new presentation action', () => {
-    PresListActions.open();
+    var id = 5,
+        action;
+        
+    PresListActions.open(id);
+    
+    action = appDispatcher.dispatch.mock.calls[0][0];
+    
+    expect(action.type).toBe(ACTIONS_PRES_VIEW.OPEN);
+    expect(action.id).toBe(id);
+  });
+  
+  it('Close presentation action', () => {
+    PresListActions.close();
     
     var action = appDispatcher.dispatch.mock.calls[0][0];
     
-    expect(action.type).toBe(ACTIONS_PRES_VIEW.OPEN);
+    expect(action.type).toBe(ACTIONS_PRES_VIEW.CLOSE);
   });
   
   it('Get slides for presentation action', () => {
@@ -42,5 +54,13 @@ describe('Action creator for presentation view', () => {
     
     expect(action.type).toBe(ACTIONS_PRES_VIEW.SHOW_SLIDE);
     expect(action.slideNumber).toBe(slideNumber);
+  });
+  
+  it('Show in fullscreen mode action', () => {
+    PresListActions.fullscreen();
+    
+    var action = appDispatcher.dispatch.mock.calls[0][0];
+    
+    expect(action.type).toBe(ACTIONS_PRES_VIEW.FULL_SCREEN);
   });
 });

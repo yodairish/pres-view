@@ -39,7 +39,9 @@ export default React.createClass({
     
     return (
       <div className="progressBar">
-        <div className="progressBar-fill" style={style}></div>
+        <div className="progressBar-fill"
+             style={style}>
+         </div>
       </div>
     );
   },

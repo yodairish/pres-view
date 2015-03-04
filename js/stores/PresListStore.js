@@ -100,6 +100,22 @@ PresListStore = Object.assign({}, EventEmitter.prototype, {
    */
   getCount() {
     return presentations.length;
+  },
+  
+  /**
+   * Get favorite status for presentation by id
+   * @param {number} id
+   * @return {boolean}
+   */
+  isFavoritePresentation(id) {
+    var index = findItemById(id),
+        favorite = false;
+  
+    if (index >= 0) {
+      favorite = !!presentations[index].favorite;
+    }
+    
+    return favorite;
   }
 });
 

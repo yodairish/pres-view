@@ -5,9 +5,11 @@ import {ACTIONS_PRES_VIEW, STORES_PRES_VIEW} from '../constants.js';
 import appDispatcher from '../dispatcher/appDispatcher.js';
 
 var slides = [],
-    currentSlide = 0;
+    presentationId = -1,
+    currentSlide = 0,
+    PresViewStore;
 
-var PresViewStore = Object.assign({}, EventEmitter.prototype, {
+PresViewStore = Object.assign({}, EventEmitter.prototype, {
   /**
    * ============ SLIDES LIST EVENTS ============
    */
@@ -109,11 +111,24 @@ var PresViewStore = Object.assign({}, EventEmitter.prototype, {
    */
   getCount() {
     return slides.length;
+  },
+  
+  /**
+   * Get ID for current presentation
+   * @returns {number}
+   */
+  getId() {
+    return presentationId;
   }
 });
 
 PresViewStore.dispatchToken = appDispatcher.register((action) => {
-  switch(action.type) {
+  switch (action.type) {
+    case ACTIONS_PRES_VIEW.OPEN: {
+      presentationId = action.id;
+      break;
+      // load slides
+    }
     case ACTIONS_PRES_VIEW.GET_SLIDES: {
       slides = action.slides;
       currentSlide = 0;

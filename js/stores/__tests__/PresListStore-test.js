@@ -115,4 +115,23 @@ describe('Store for presentations list', () => {
     expect(changeCallback.mock.calls.length).toBe(2);
     expect(items[0].favorite).toBeTruthy();
   });
+  
+  it('Check favorite status for item', () => {
+    var id1 = 123,
+        id2 = 321;
+    
+    callback({
+      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS,
+      items: [{
+        id: id1,
+        favorite: true
+      }, {
+        id: id2
+      }]
+    });
+    
+    expect(PresListStore.isFavoritePresentation(id1)).toBeTruthy();
+    expect(PresListStore.isFavoritePresentation(id2)).toBeFalsy();
+    expect(PresListStore.isFavoritePresentation(-1)).toBeFalsy();
+  });
 });

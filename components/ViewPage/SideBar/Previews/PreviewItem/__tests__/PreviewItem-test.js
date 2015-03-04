@@ -29,7 +29,9 @@ describe('PreviewItem component', () => {
     expect(previewItem.className).not.toContain('preview-item--displayed');
     
     previewItem = TestUtils.renderIntoDocument(
-       <PreviewItem img={img} position={position} displayed />
+       <PreviewItem img={img}
+                    position={position}
+                    displayed />
      ).getDOMNode();
     
     expect(previewItem.className).toContain('preview-item--displayed');

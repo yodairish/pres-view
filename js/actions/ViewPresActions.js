@@ -6,10 +6,21 @@ import {ACTIONS_PRES_VIEW} from '../constants.js';
 export default {
   /**
    * Open new presentation
+   * @param {number} id
    */
-  open() {
+  open(id) {
     appDispatcher.dispatch({
-      type: ACTIONS_PRES_VIEW.OPEN
+      type: ACTIONS_PRES_VIEW.OPEN,
+      id: id
+    });
+  },
+  
+  /**
+   * Close presentation
+   */
+  close() {
+    appDispatcher.dispatch({
+      type: ACTIONS_PRES_VIEW.CLOSE
     });
   },
   
@@ -32,6 +43,24 @@ export default {
     appDispatcher.dispatch({
       type: ACTIONS_PRES_VIEW.SHOW_SLIDE,
       slideNumber: slideNumber
+    });
+  },
+  
+  /**
+   * Open presentation in full screen mode
+   */
+  fullscreen() {
+    appDispatcher.dispatch({
+      type: ACTIONS_PRES_VIEW.FULL_SCREEN
+    });
+  },
+  
+  /**
+   * Toggle favorite status for presentation
+   */
+  toggleFavoriteStatus() {
+    appDispatcher.dispatch({
+      type: ACTIONS_PRES_VIEW.TOGGLE_FAVORITE
     });
   }
 };

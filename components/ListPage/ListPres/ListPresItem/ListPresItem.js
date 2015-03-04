@@ -33,7 +33,7 @@ export default React.createClass({
     var cx = React.addons.classSet,
         favoritesClasses = cx({
           'listPresItem-favorite': true,
-          'favorites--active': this.props.favorite
+          'control--active': this.props.favorite
         });
     
     return (

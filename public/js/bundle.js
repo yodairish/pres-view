@@ -630,8 +630,8 @@
 	  render: function render() {
 	    var cx = React.addons.classSet,
 	        favoritesClasses = cx({
-	      "menu-button": true,
-	      "favorites--active": this.state.favorites
+	      "control-button": true,
+	      "control--active": this.state.favorites
 	    });
 
 	    return React.createElement(
@@ -825,6 +825,11 @@
 	    PresListStore;
 
 	PresListStore = Object.assign({}, EventEmitter.prototype, {
+
+	  /**
+	   * ============ CHANGE EVENTS ============
+	   */
+
 	  /**
 	   * Call all change callbacks
 	   */
@@ -848,6 +853,12 @@
 	    this.removeListener(STORES_PRES_LIST.CHANGE, callback);
 	  },
 
+	  // ========================================
+
+	  /**
+	   * ============ LOADING EVENTS ============
+	   */
+
 	  /**
 	   * Call all loading callbacks
 	   */
@@ -870,6 +881,8 @@
 	  removeLoadingListener: function removeLoadingListener(callback) {
 	    this.removeListener(STORES_PRES_LIST.LOADING, callback);
 	  },
+
+	  // ========================================
 
 	  /**
 	   * Return all available presentations
@@ -901,6 +914,22 @@
 	   */
 	  getCount: function getCount() {
 	    return presentations.length;
+	  },
+
+	  /**
+	   * Get favorite status for presentation by id
+	   * @param {number} id
+	   * @return {boolean}
+	   */
+	  isFavoritePresentation: function isFavoritePresentation(id) {
+	    var index = findItemById(id),
+	        favorite = false;
+
+	    if (index >= 0) {
+	      favorite = !!presentations[index].favorite;
+	    }
+
+	    return favorite;
 	  }
 	});
 
@@ -1002,17 +1031,6 @@
 	  },
 
 	  /**
-	   * Create action for showing only favorites
-	   * @param {boolean} active
-	   */
-	  showFavorites: function showFavorites(active) {
-	    appDispatcher.dispatch({
-	      type: ACTIONS_PRES_LIST.FAVORITES,
-	      active: active
-	    });
-	  },
-
-	  /**
 	   * Create action for getting new items
 	   * @param {array} items
 	   */
@@ -1031,6 +1049,17 @@
 	    appDispatcher.dispatch({
 	      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS_ERROR,
 	      error: error
+	    });
+	  },
+
+	  /**
+	   * Create action for showing only favorites
+	   * @param {boolean} active
+	   */
+	  showFavorites: function showFavorites(active) {
+	    appDispatcher.dispatch({
+	      type: ACTIONS_PRES_LIST.FAVORITES,
+	      active: active
 	    });
 	  },
 
@@ -1090,7 +1119,7 @@
 	    var cx = React.addons.classSet,
 	        favoritesClasses = cx({
 	      "listPresItem-favorite": true,
-	      "favorites--active": this.props.favorite
+	      "control--active": this.props.favorite
 	    });
 
 	    return React.createElement(
@@ -1239,10 +1268,61 @@
 	module.exports = {
 	  /**
 	   * Open new presentation
+	   * @param {number} id
 	   */
-	  open: function open() {
+	  open: function open(id) {
 	    appDispatcher.dispatch({
-	      type: ACTIONS_PRES_VIEW.OPEN
+	      type: ACTIONS_PRES_VIEW.OPEN,
+	      id: id
+	    });
+	  },
+
+	  /**
+	   * Close presentation
+	   */
+	  close: function close() {
+	    appDispatcher.dispatch({
+	      type: ACTIONS_PRES_VIEW.CLOSE
+	    });
+	  },
+
+	  /**
+	   * Create action for getting presentation slides
+	   * @param {array} slides
+	   */
+	  getSlides: function getSlides(slides) {
+	    appDispatcher.dispatch({
+	      type: ACTIONS_PRES_VIEW.GET_SLIDES,
+	      slides: slides
+	    });
+	  },
+
+	  /**
+	   * Show picked slide
+	   * @param {number} slideNumber
+	   */
+	  showSlide: function showSlide(slideNumber) {
+	    appDispatcher.dispatch({
+	      type: ACTIONS_PRES_VIEW.SHOW_SLIDE,
+	      slideNumber: slideNumber
+	    });
+	  },
+
+	  /**
+	   * Open presentation in full screen mode
+	   */
+	  fullscreen: function fullscreen() {
+	    appDispatcher.dispatch({
+	      type: ACTIONS_PRES_VIEW.FULL_SCREEN
+	    });
+	  },
+
+	  /**
+	   * Toggle favorite status for presentation
+	   */
+	  toggleFavoriteStatus: function toggleFavoriteStatus() {
+	    appDispatcher.dispatch({
+	      type: ACTIONS_PRES_VIEW.TOGGLE_FAVORITE
 	    });
 	  }
 	};
@@ -6248,7 +6328,7 @@
 	var ReactPropTypeLocationNames = __webpack_require__(58);
 
 	var deprecated = __webpack_require__(34);
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 
 	/**
 	 * Collection of methods that allow declaration and validation of props that are
@@ -6561,8 +6641,8 @@
 
 	var ReactElement = __webpack_require__(20);
 	var ReactInstanceHandles = __webpack_require__(25);
-	var ReactMarkupChecksum = __webpack_require__(99);
-	var ReactServerRenderingTransaction = __webpack_require__(100);
+	var ReactMarkupChecksum = __webpack_require__(98);
+	var ReactServerRenderingTransaction = __webpack_require__(99);
 
 	var instantiateReactComponent = __webpack_require__(59);
 	var invariant = __webpack_require__(48);
@@ -6909,24 +6989,35 @@
 	var keyMirror = _interopRequire(__webpack_require__(109));
 
 	var ACTIONS_PRES_LIST = keyMirror({
-	  LOADING: null,
-	  LOAD_MORE: null,
-	  FAVORITES: null,
-	  GET_NEW_ITEMS: null,
-	  GET_NEW_ITEMS_ERROR: null,
-	  TOGGLE_FAVORITE: null
+	                      LOADING: null,
+	                      LOAD_MORE: null,
+	                      FAVORITES: null,
+	                      GET_NEW_ITEMS: null,
+	                      GET_NEW_ITEMS_ERROR: null,
+	                      TOGGLE_FAVORITE: null
 	}),
 	    ACTIONS_PRES_VIEW = keyMirror({
-	  OPEN: null
+	                      OPEN: null,
+	                      CLOSE: null,
+	                      SHOW_SLIDE: null,
+	                      GET_SLIDES: null,
+	                      FULL_SCREEN: null,
+	                      TOGGLE_FAVORITE: null
 	}),
 	    STORES_PRES_LIST = keyMirror({
-	  CHANGE: null
+	                      CHANGE: null
+	}),
+	    STORES_PRES_VIEW = keyMirror({
+	                      SLIDE_LIST: null,
+	                      PROGRESS: null,
+	                      CURRENT_SLIDE: null
 	});
 
 	module.exports = {
-	  ACTIONS_PRES_LIST: ACTIONS_PRES_LIST,
-	  ACTIONS_PRES_VIEW: ACTIONS_PRES_VIEW,
-	  STORES_PRES_LIST: STORES_PRES_LIST
+	                      ACTIONS_PRES_LIST: ACTIONS_PRES_LIST,
+	                      ACTIONS_PRES_VIEW: ACTIONS_PRES_VIEW,
+	                      STORES_PRES_LIST: STORES_PRES_LIST,
+	                      STORES_PRES_VIEW: STORES_PRES_VIEW
 	};
 
 /***/ },
@@ -7780,7 +7871,7 @@
 
 	"use strict";
 
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 
 	/**
 	 * Similar to invariant but only logs a warning if the condition is not met.
@@ -8766,7 +8857,7 @@
 	"use strict";
 
 	var assign = __webpack_require__(33);
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 	var invariant = __webpack_require__(48);
 	var joinClasses = __webpack_require__(115);
 	var warning = __webpack_require__(46);
@@ -10890,7 +10981,7 @@
 
 	var EventConstants = __webpack_require__(47);
 
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 
 	var topLevelTypes = EventConstants.topLevelTypes;
 
@@ -10947,7 +11038,7 @@
 	"use strict";
 
 	var ReactDOMIDOperations = __webpack_require__(133);
-	var ReactMarkupChecksum = __webpack_require__(99);
+	var ReactMarkupChecksum = __webpack_require__(98);
 	var ReactMount = __webpack_require__(27);
 	var ReactPerf = __webpack_require__(29);
 	var ReactReconcileTransaction = __webpack_require__(134);
@@ -11032,7 +11123,7 @@
 	var Transaction = __webpack_require__(114);
 
 	var assign = __webpack_require__(33);
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 
 	var RESET_BATCHED_UPDATES = {
 	  initialize: emptyFunction,
@@ -11100,7 +11191,7 @@
 
 	"use strict";
 
-	var AutoFocusMixin = __webpack_require__(137);
+	var AutoFocusMixin = __webpack_require__(136);
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
@@ -11168,7 +11259,7 @@
 	"use strict";
 
 	var EventConstants = __webpack_require__(47);
-	var LocalEventTrapMixin = __webpack_require__(136);
+	var LocalEventTrapMixin = __webpack_require__(137);
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
@@ -11221,7 +11312,7 @@
 	"use strict";
 
 	var EventConstants = __webpack_require__(47);
-	var LocalEventTrapMixin = __webpack_require__(136);
+	var LocalEventTrapMixin = __webpack_require__(137);
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
 	var ReactElement = __webpack_require__(20);
@@ -11271,7 +11362,7 @@
 
 	"use strict";
 
-	var AutoFocusMixin = __webpack_require__(137);
+	var AutoFocusMixin = __webpack_require__(136);
 	var DOMPropertyOperations = __webpack_require__(13);
 	var LinkedValueUtils = __webpack_require__(138);
 	var ReactBrowserComponentMixin = __webpack_require__(65);
@@ -11488,7 +11579,7 @@
 
 	"use strict";
 
-	var AutoFocusMixin = __webpack_require__(137);
+	var AutoFocusMixin = __webpack_require__(136);
 	var LinkedValueUtils = __webpack_require__(138);
 	var ReactBrowserComponentMixin = __webpack_require__(65);
 	var ReactCompositeComponent = __webpack_require__(17);
@@ -11667,7 +11758,7 @@
 
 	"use strict";
 
-	var AutoFocusMixin = __webpack_require__(137);
+	var AutoFocusMixin = __webpack_require__(136);
 	var DOMPropertyOperations = __webpack_require__(13);
 	var LinkedValueUtils = __webpack_require__(138);
 	var ReactBrowserComponentMixin = __webpack_require__(65);
@@ -12011,10 +12102,10 @@
 	var ReactInputSelection = __webpack_require__(129);
 	var SyntheticEvent = __webpack_require__(127);
 
-	var getActiveElement = __webpack_require__(142);
+	var getActiveElement = __webpack_require__(153);
 	var isTextInputElement = __webpack_require__(128);
 	var keyOf = __webpack_require__(60);
-	var shallowEqual = __webpack_require__(143);
+	var shallowEqual = __webpack_require__(154);
 
 	var topLevelTypes = EventConstants.topLevelTypes;
 
@@ -12220,17 +12311,17 @@
 	var EventConstants = __webpack_require__(47);
 	var EventPluginUtils = __webpack_require__(14);
 	var EventPropagators = __webpack_require__(125);
-	var SyntheticClipboardEvent = __webpack_require__(144);
+	var SyntheticClipboardEvent = __webpack_require__(142);
 	var SyntheticEvent = __webpack_require__(127);
-	var SyntheticFocusEvent = __webpack_require__(145);
-	var SyntheticKeyboardEvent = __webpack_require__(146);
+	var SyntheticFocusEvent = __webpack_require__(143);
+	var SyntheticKeyboardEvent = __webpack_require__(144);
 	var SyntheticMouseEvent = __webpack_require__(132);
-	var SyntheticDragEvent = __webpack_require__(147);
-	var SyntheticTouchEvent = __webpack_require__(148);
-	var SyntheticUIEvent = __webpack_require__(149);
-	var SyntheticWheelEvent = __webpack_require__(150);
+	var SyntheticDragEvent = __webpack_require__(145);
+	var SyntheticTouchEvent = __webpack_require__(146);
+	var SyntheticUIEvent = __webpack_require__(147);
+	var SyntheticWheelEvent = __webpack_require__(148);
 
-	var getEventCharCode = __webpack_require__(151);
+	var getEventCharCode = __webpack_require__(149);
 
 	var invariant = __webpack_require__(48);
 	var keyOf = __webpack_require__(60);
@@ -12783,11 +12874,11 @@
 	"use strict";
 
 	var DOMProperty = __webpack_require__(43);
-	var ReactDefaultPerfAnalysis = __webpack_require__(152);
+	var ReactDefaultPerfAnalysis = __webpack_require__(151);
 	var ReactMount = __webpack_require__(27);
 	var ReactPerf = __webpack_require__(29);
 
-	var performanceNow = __webpack_require__(153);
+	var performanceNow = __webpack_require__(152);
 
 	function roundFloat(val) {
 	  return Math.floor(val * 100) / 100;
@@ -13044,7 +13135,7 @@
 	 * @typechecks
 	 */
 
-	var isTextNode = __webpack_require__(154);
+	var isTextNode = __webpack_require__(150);
 
 	/*jslint bitwise:true */
 
@@ -13224,49 +13315,6 @@
 /* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule emptyFunction
-	 */
-
-	function makeEmptyFunction(arg) {
-	  return function () {
-	    return arg;
-	  };
-	}
-
-	/**
-	 * This function accepts and discards inputs; it has no side effects. This is
-	 * primarily useful idiomatically for overridable function endpoints which
-	 * always need to be callable, since JS lacks a null-call idiom ala Cocoa.
-	 */
-	function emptyFunction() {}
-
-	emptyFunction.thatReturns = makeEmptyFunction;
-	emptyFunction.thatReturnsFalse = makeEmptyFunction(false);
-	emptyFunction.thatReturnsTrue = makeEmptyFunction(true);
-	emptyFunction.thatReturnsNull = makeEmptyFunction(null);
-	emptyFunction.thatReturnsThis = function () {
-	  return this;
-	};
-	emptyFunction.thatReturnsArgument = function (arg) {
-	  return arg;
-	};
-
-	module.exports = emptyFunction;
-
-/***/ },
-/* 99 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/**
 	 * Copyright 2013-2014, Facebook, Inc.
 	 * All rights reserved.
@@ -13310,7 +13358,7 @@
 	module.exports = ReactMarkupChecksum;
 
 /***/ },
-/* 100 */
+/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -13333,7 +13381,7 @@
 	var Transaction = __webpack_require__(114);
 
 	var assign = __webpack_require__(33);
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 
 	/**
 	 * Provides a `CallbackQueue` queue for collecting `onDOMReady` callbacks
@@ -13419,6 +13467,49 @@
 	module.exports = ReactServerRenderingTransaction;
 
 /***/ },
+/* 100 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule emptyFunction
+	 */
+
+	function makeEmptyFunction(arg) {
+	  return function () {
+	    return arg;
+	  };
+	}
+
+	/**
+	 * This function accepts and discards inputs; it has no side effects. This is
+	 * primarily useful idiomatically for overridable function endpoints which
+	 * always need to be callable, since JS lacks a null-call idiom ala Cocoa.
+	 */
+	function emptyFunction() {}
+
+	emptyFunction.thatReturns = makeEmptyFunction;
+	emptyFunction.thatReturnsFalse = makeEmptyFunction(false);
+	emptyFunction.thatReturnsTrue = makeEmptyFunction(true);
+	emptyFunction.thatReturnsNull = makeEmptyFunction(null);
+	emptyFunction.thatReturnsThis = function () {
+	  return this;
+	};
+	emptyFunction.thatReturnsArgument = function (arg) {
+	  return arg;
+	};
+
+	module.exports = emptyFunction;
+
+/***/ },
 /* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -13476,7 +13567,7 @@
 
 	"use strict";
 
-	var shallowEqual = __webpack_require__(143);
+	var shallowEqual = __webpack_require__(154);
 
 	/**
 	 * If your React component's render function is "pure", e.g. it will render the
@@ -13591,7 +13682,7 @@
 
 	var assign = __webpack_require__(33);
 	var cloneWithProps = __webpack_require__(106);
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 
 	var ReactTransitionGroup = React.createClass({
 	  displayName: "ReactTransitionGroup",
@@ -16208,7 +16299,7 @@
 	var PooledClass = __webpack_require__(49);
 
 	var assign = __webpack_require__(33);
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 	var getEventTarget = __webpack_require__(140);
 
 	/**
@@ -16411,7 +16502,7 @@
 
 	var containsNode = __webpack_require__(94);
 	var focusNode = __webpack_require__(167);
-	var getActiveElement = __webpack_require__(142);
+	var getActiveElement = __webpack_require__(153);
 
 	function isInDocument(node) {
 	  return containsNode(document.documentElement, node);
@@ -16616,7 +16707,7 @@
 
 	"use strict";
 
-	var SyntheticUIEvent = __webpack_require__(149);
+	var SyntheticUIEvent = __webpack_require__(147);
 	var ViewportMetrics = __webpack_require__(124);
 
 	var getEventModifierState = __webpack_require__(168);
@@ -17085,6 +17176,36 @@
 /* 136 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule AutoFocusMixin
+	 * @typechecks static-only
+	 */
+
+	"use strict";
+
+	var focusNode = __webpack_require__(167);
+
+	var AutoFocusMixin = {
+	  componentDidMount: function () {
+	    if (this.props.autoFocus) {
+	      focusNode(this.getDOMNode());
+	    }
+	  }
+	};
+
+	module.exports = AutoFocusMixin;
+
+/***/ },
+/* 137 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/* WEBPACK VAR INJECTION */(function(process) {/**
 	 * Copyright 2014, Facebook, Inc.
 	 * All rights reserved.
@@ -17127,36 +17248,6 @@
 
 	module.exports = LocalEventTrapMixin;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(41)))
-
-/***/ },
-/* 137 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule AutoFocusMixin
-	 * @typechecks static-only
-	 */
-
-	"use strict";
-
-	var focusNode = __webpack_require__(167);
-
-	var AutoFocusMixin = {
-	  componentDidMount: function () {
-	    if (this.props.autoFocus) {
-	      focusNode(this.getDOMNode());
-	    }
-	  }
-	};
-
-	module.exports = AutoFocusMixin;
 
 /***/ },
 /* 138 */
@@ -17311,7 +17402,7 @@
 	 * @typechecks
 	 */
 
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 
 	/**
 	 * Upstream version of event listener. Does not take into account specific
@@ -17457,86 +17548,6 @@
 /* 142 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule getActiveElement
-	 * @typechecks
-	 */
-
-	/**
-	 * Same as document.activeElement but wraps in a try-catch block. In IE it is
-	 * not safe to call document.activeElement if there is nothing focused.
-	 *
-	 * The activeElement will be null only if the document body is not yet defined.
-	 */
-	function getActiveElement() /*?DOMElement*/{
-	  try {
-	    return document.activeElement || document.body;
-	  } catch (e) {
-	    return document.body;
-	  }
-	}
-
-	module.exports = getActiveElement;
-
-/***/ },
-/* 143 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule shallowEqual
-	 */
-
-	"use strict";
-
-	/**
-	 * Performs equality by iterating through keys on an object and returning
-	 * false when any key has values which are not strictly equal between
-	 * objA and objB. Returns true when the values of all keys are strictly equal.
-	 *
-	 * @return {boolean}
-	 */
-	function shallowEqual(objA, objB) {
-	  if (objA === objB) {
-	    return true;
-	  }
-	  var key;
-	  // Test for A's keys different from B.
-	  for (key in objA) {
-	    if (objA.hasOwnProperty(key) && (!objB.hasOwnProperty(key) || objA[key] !== objB[key])) {
-	      return false;
-	    }
-	  }
-	  // Test for B's keys missing from A.
-	  for (key in objB) {
-	    if (objB.hasOwnProperty(key) && !objA.hasOwnProperty(key)) {
-	      return false;
-	    }
-	  }
-	  return true;
-	}
-
-	module.exports = shallowEqual;
-
-/***/ },
-/* 144 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/**
 	 * Copyright 2013-2014, Facebook, Inc.
 	 * All rights reserved.
@@ -17578,7 +17589,7 @@
 	module.exports = SyntheticClipboardEvent;
 
 /***/ },
-/* 145 */
+/* 143 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17595,7 +17606,7 @@
 
 	"use strict";
 
-	var SyntheticUIEvent = __webpack_require__(149);
+	var SyntheticUIEvent = __webpack_require__(147);
 
 	/**
 	 * @interface FocusEvent
@@ -17620,7 +17631,7 @@
 	module.exports = SyntheticFocusEvent;
 
 /***/ },
-/* 146 */
+/* 144 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17637,9 +17648,9 @@
 
 	"use strict";
 
-	var SyntheticUIEvent = __webpack_require__(149);
+	var SyntheticUIEvent = __webpack_require__(147);
 
-	var getEventCharCode = __webpack_require__(151);
+	var getEventCharCode = __webpack_require__(149);
 	var getEventKey = __webpack_require__(170);
 	var getEventModifierState = __webpack_require__(168);
 
@@ -17710,7 +17721,7 @@
 	module.exports = SyntheticKeyboardEvent;
 
 /***/ },
-/* 147 */
+/* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17752,7 +17763,7 @@
 	module.exports = SyntheticDragEvent;
 
 /***/ },
-/* 148 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17769,7 +17780,7 @@
 
 	"use strict";
 
-	var SyntheticUIEvent = __webpack_require__(149);
+	var SyntheticUIEvent = __webpack_require__(147);
 
 	var getEventModifierState = __webpack_require__(168);
 
@@ -17803,7 +17814,7 @@
 	module.exports = SyntheticTouchEvent;
 
 /***/ },
-/* 149 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17868,7 +17879,7 @@
 	module.exports = SyntheticUIEvent;
 
 /***/ },
-/* 150 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17928,7 +17939,7 @@
 	module.exports = SyntheticWheelEvent;
 
 /***/ },
-/* 151 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -17983,7 +17994,37 @@
 	module.exports = getEventCharCode;
 
 /***/ },
-/* 152 */
+/* 150 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule isTextNode
+	 * @typechecks
+	 */
+
+	var isNode = __webpack_require__(171);
+
+	/**
+	 * @param {*} object The object to check.
+	 * @return {boolean} Whether or not the object is a DOM text node.
+	 */
+	function isTextNode(object) {
+	  return isNode(object) && object.nodeType == 3;
+	}
+
+	module.exports = isTextNode;
+
+/***/ },
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -18186,7 +18227,7 @@
 	module.exports = ReactDefaultPerfAnalysis;
 
 /***/ },
-/* 153 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -18219,7 +18260,7 @@
 	module.exports = performanceNow;
 
 /***/ },
-/* 154 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -18232,21 +18273,71 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
-	 * @providesModule isTextNode
+	 * @providesModule getActiveElement
 	 * @typechecks
 	 */
 
-	var isNode = __webpack_require__(171);
-
 	/**
-	 * @param {*} object The object to check.
-	 * @return {boolean} Whether or not the object is a DOM text node.
+	 * Same as document.activeElement but wraps in a try-catch block. In IE it is
+	 * not safe to call document.activeElement if there is nothing focused.
+	 *
+	 * The activeElement will be null only if the document body is not yet defined.
 	 */
-	function isTextNode(object) {
-	  return isNode(object) && object.nodeType == 3;
+	function getActiveElement() /*?DOMElement*/{
+	  try {
+	    return document.activeElement || document.body;
+	  } catch (e) {
+	    return document.body;
+	  }
 	}
 
-	module.exports = isTextNode;
+	module.exports = getActiveElement;
+
+/***/ },
+/* 154 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule shallowEqual
+	 */
+
+	"use strict";
+
+	/**
+	 * Performs equality by iterating through keys on an object and returning
+	 * false when any key has values which are not strictly equal between
+	 * objA and objB. Returns true when the values of all keys are strictly equal.
+	 *
+	 * @return {boolean}
+	 */
+	function shallowEqual(objA, objB) {
+	  if (objA === objB) {
+	    return true;
+	  }
+	  var key;
+	  // Test for A's keys different from B.
+	  for (key in objA) {
+	    if (objA.hasOwnProperty(key) && (!objB.hasOwnProperty(key) || objA[key] !== objB[key])) {
+	      return false;
+	    }
+	  }
+	  // Test for B's keys missing from A.
+	  for (key in objB) {
+	    if (objB.hasOwnProperty(key) && !objA.hasOwnProperty(key)) {
+	      return false;
+	    }
+	  }
+	  return true;
+	}
+
+	module.exports = shallowEqual;
 
 /***/ },
 /* 155 */
@@ -19617,7 +19708,7 @@
 
 	"use strict";
 
-	var getEventCharCode = __webpack_require__(151);
+	var getEventCharCode = __webpack_require__(149);
 
 	/**
 	 * Normalization of deprecated HTML5 `key` values
@@ -20081,7 +20172,7 @@
 	var ExecutionEnvironment = __webpack_require__(36);
 
 	var createNodesFromMarkup = __webpack_require__(178);
-	var emptyFunction = __webpack_require__(98);
+	var emptyFunction = __webpack_require__(100);
 	var getMarkupWrap = __webpack_require__(179);
 	var invariant = __webpack_require__(48);
 

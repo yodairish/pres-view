@@ -48,9 +48,9 @@
  *  Active favorites
  */
 
-.favorites--active .favorites-star,
-.favorites--active .favorites-star:before,
-.favorites--active .favorites-star:after {
+.control--active .favorites-star,
+.control--active .favorites-star:before,
+.control--active .favorites-star:after {
   border-bottom-color: var(--color-secondary);
 }
 
