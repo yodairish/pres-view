@@ -106,6 +106,14 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
   },
   
   /**
+   * Get image for current slide
+   * @return {string}
+   */
+  getCurrentSlideImg() {
+    return slides[currentSlide] || '';
+  },
+  
+  /**
    * Get count of slides
    * @returns {number}
    */
