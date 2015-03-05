@@ -8,9 +8,39 @@ var slides = [],
     presentationId = -1,
     currentSlide = 0,
     fullscreen = false,
+    visibility = false,
     PresViewStore;
 
 PresViewStore = Object.assign({}, EventEmitter.prototype, {
+  /**
+   * ============ VISIBILITY EVENTS ============
+   */
+   
+  /**
+   * Call all visibility changes callbacks
+   */
+  emitVisibility() {
+    this.emit(STORES_PRES_VIEW.VISIBILITY);
+  },
+
+  /**
+   * Add new listener for changing visibility
+   * @param {function} callback
+   */
+  addVisibilityListener(callback) {
+    this.on(STORES_PRES_VIEW.VISIBILITY, callback);
+  },
+  
+  /**
+   * Remove listener for changing visibility
+   * @param {function} callback
+   */
+  removeVisibilityListener(callback) {
+    this.removeListener(STORES_PRES_VIEW.VISIBILITY, callback);
+  },
+  
+  // ========================================
+  
   /**
    * ============ SLIDES LIST EVENTS ============
    */
@@ -106,7 +136,7 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
    * call all changing fullscreen callbacks
    */
   emitFullscreen() {
-    this.emit(STORES_PRES_VIEW.CURRENT_SLIDE);
+    this.emit(STORES_PRES_VIEW.FULL_SCREEN);
   },
 
   /**
@@ -114,7 +144,7 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
    * @param {function} callback
    */
   addFullscreenListener(callback) {
-    this.on(STORES_PRES_VIEW.CURRENT_SLIDE, callback);
+    this.on(STORES_PRES_VIEW.FULL_SCREEN, callback);
   },
   
   /**
@@ -122,7 +152,7 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
    * @param {function} callback
    */
   removeFullscreenListener(callback) {
-    this.removeListener(STORES_PRES_VIEW.CURRENT_SLIDE, callback);
+    this.removeListener(STORES_PRES_VIEW.FULL_SCREEN, callback);
   },
   
   // ========================================
@@ -165,6 +195,14 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
    */
   getFullscreeStatus() {
     return fullscreen;
+  },
+  
+  /**
+   * Get current visibility
+   * @returns {boolean}
+   */
+  getVisibility() {
+    return visibility;
   }
 });
 
@@ -172,8 +210,15 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
   switch (action.type) {
     case ACTIONS_PRES_VIEW.OPEN: {
       presentationId = action.id;
+      visibility = true;
+      PresViewStore.emitVisibility();
       break;
       // load slides
+    }
+    case ACTIONS_PRES_VIEW.CLOSE: {
+      visibility = false;
+      PresViewStore.emitVisibility();
+      break;
     }
     case ACTIONS_PRES_VIEW.GET_SLIDES: {
       slides = action.slides;

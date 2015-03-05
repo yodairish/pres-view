@@ -10,7 +10,9 @@ describe('Store for view presentation', () => {
       callback,
       slideListCallback,
       progressCallback,
-      currentSlideCallback;
+      currentSlideCallback,
+      fullscreenCallback,
+      visibilityCallback;
   
   beforeEach(() => {
     appDispatcher = require('../../dispatcher/appDispatcher.js');
@@ -21,10 +23,14 @@ describe('Store for view presentation', () => {
     slideListCallback = jest.genMockFn();
     progressCallback = jest.genMockFn();
     currentSlideCallback = jest.genMockFn();
+    fullscreenCallback = jest.genMockFn();
+    visibilityCallback = jest.genMockFn();
     
     PresViewStore.addSlideListListener(slideListCallback);
     PresViewStore.addProgressListener(progressCallback);
     PresViewStore.addCurrentSlideListener(currentSlideCallback);
+    PresViewStore.addFullscreenListener(fullscreenCallback);
+    PresViewStore.addVisibilityListener(visibilityCallback);
   });
   
   afterEach(() => {
@@ -84,7 +90,7 @@ describe('Store for view presentation', () => {
     expect(progressCallback.mock.calls[1][0]).toBe(75);
   });
   
-  it('Update id when open new presentation', () => {
+  it('Open new presentation', () => {
     var id = 5;
     
     callback({
@@ -93,5 +99,23 @@ describe('Store for view presentation', () => {
     });
     
     expect(PresViewStore.getId()).toBe(id);
+    expect(PresViewStore.getVisibility()).toBeTruthy();
   });
+  
+  it('Close presentation', () => {
+    callback({
+      type: ACTIONS_PRES_VIEW.CLOSE
+    });
+    
+    expect(PresViewStore.getVisibility()).toBeFalsy();
+  });
+  
+  it('Update fullscreen status', () => {
+    callback({
+      type: ACTIONS_PRES_VIEW.FULL_SCREEN,
+      status: true
+    });
+    
+    expect(PresViewStore.getFullscreeStatus()).toBeTruthy();
+  }); 
 });

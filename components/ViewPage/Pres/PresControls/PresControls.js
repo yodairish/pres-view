@@ -56,6 +56,9 @@ export default React.createClass({
     ViewPresActions.fullscreen(false);
   },
   
+  /**
+   * Update slide info
+   */
   onUpdateSlide() {
     this.setState({
       slide: getSlide(),

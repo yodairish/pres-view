@@ -2,9 +2,9 @@
 
 import './helper.js';
 import React from 'react';
-import ListPage from '../components/ListPage/ListPage.js';
+import PresApp from '../components/PresApp/PresApp.js';
 
 React.render(
-  <ListPage />,
+  <PresApp />,
   document.body
 );

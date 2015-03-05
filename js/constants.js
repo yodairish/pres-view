@@ -22,9 +22,11 @@ const ACTIONS_PRES_LIST = keyMirror({
                             CHANGE: null
                           }),
       STORES_PRES_VIEW = keyMirror({
+                            VISIBILITY: null,
                             SLIDE_LIST: null,
                             PROGRESS: null,
-                            CURRENT_SLIDE: null
+                            CURRENT_SLIDE: null,
+                            FULL_SCREEN: null
                           });
 
 export default {
