@@ -57,10 +57,11 @@ describe('Action creator for presentation view', () => {
   });
   
   it('Show in fullscreen mode action', () => {
-    PresListActions.fullscreen();
+    PresListActions.fullscreen(true);
     
     var action = appDispatcher.dispatch.mock.calls[0][0];
     
     expect(action.type).toBe(ACTIONS_PRES_VIEW.FULL_SCREEN);
+    expect(action.status).toBeTruthy();
   });
 });

@@ -1,20 +1,29 @@
 'use strict';
 
-// jest.dontMock('../ProgressBar/ProgressBar.js');
+jest.dontMock('../PresControls/PresControls.js');
 jest.dontMock('../Pres.js');
 
 import React from 'react/addons';
 import Pres from '../Pres.js';
+import PresControls from '../PresControls/PresControls.js';
 import PresViewStore from '../../../../js/stores/PresViewStore.js';
 
 var TestUtils = React.addons.TestUtils;
 
 describe('Pres component', () => {
-  var img = 'startImage.jpg',
+  var slides = [
+        'startImage.jpg',
+        'other.jpg'
+      ],
       pres;
   
   beforeEach(() => {
-    PresViewStore.getCurrentSlideImg.mockReturnValue(img);
+    PresViewStore.getCurrentSlide.mockReturnValue(0);
+    PresViewStore.getSlides.mockReturnValue(slides);
+    PresViewStore.getFullscreeStatus.mockReturnValue(false);
+    
+    PresViewStore.addCurrentSlideListener.mockClear();
+    PresViewStore.addFullscreenListener.mockClear();
     
     pres = TestUtils.renderIntoDocument(
       <Pres />
@@ -26,23 +35,41 @@ describe('Pres component', () => {
           pres,
           'presentation-img'
         );
-    
-    expect(image.props.src).toBe(img);
+        
+    expect(image.props.src).toBe(slides[0]);
   });
   
   it('Update image when change slide', () => {
-    var img2 = 'other.jpg',
-        image;
+    var image;
     
-    PresViewStore.getCurrentSlideImg.mockReturnValue(img2);
+    PresViewStore.getCurrentSlide.mockReturnValue(1);
     PresViewStore.addCurrentSlideListener.mock.calls[0][0]();
     
-    image = TestUtils.scryRenderedDOMComponentsWithClass(
+    image = TestUtils.findRenderedDOMComponentWithClass(
       pres,
       'presentation-img'
     );
     
-    // FIXME some reason it's don't changed here..    
-    // expect(image.props.src).toBe(img2);
+    // // FIXME some reason it's don't changed here..
+    // expect(image.props.src).toBe(slides[1]);
+  });
+  
+  it('Show controls in fullscreen mode', () => {
+    var controls = TestUtils.scryRenderedComponentsWithType(
+          pres,
+          PresControls
+        );
+    
+    expect(controls.length).toBe(0);
+    
+    PresViewStore.getFullscreeStatus.mockReturnValue(true);
+    PresViewStore.addFullscreenListener.mock.calls[0][0]();
+    
+    controls = TestUtils.scryRenderedComponentsWithType(
+      pres,
+      PresControls
+    );
+    
+    expect(controls.length).toBe(1);
   });
 });

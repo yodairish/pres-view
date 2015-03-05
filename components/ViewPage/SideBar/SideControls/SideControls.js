@@ -91,6 +91,6 @@ export default React.createClass({
    * Activate full screen mode
    */
   onFullScreen() {
-    ViewPresActions.fullscreen();
+    ViewPresActions.fullscreen(true);
   }
 });

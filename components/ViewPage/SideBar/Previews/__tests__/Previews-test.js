@@ -23,6 +23,7 @@ describe('Previews component', () => {
       position: 2
     }];
     
+    PresViewStore.getCurrentSlide.mockReturnValue(0);
     PresViewStore.getSlides.mockReturnValue(list);
     PresViewStore.addSlideListListener.mockClear();
     PresViewStore.addCurrentSlideListener.mockClear();
@@ -63,6 +64,7 @@ describe('Previews component', () => {
   it('Set new displayed item', () => {
     var items;
     
+    PresViewStore.getCurrentSlide.mockReturnValue(1);
     PresViewStore.addCurrentSlideListener.mock.calls[0][0](1);
     
     items = TestUtils.scryRenderedComponentsWithType(

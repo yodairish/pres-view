@@ -11,7 +11,7 @@ export default React.createClass({
   getInitialState() {
     return {
       items: PresViewStore.getSlides(),
-      displayedItem: -1
+      displayedItem: PresViewStore.getCurrentSlide()
     };
   },
   
@@ -20,8 +20,8 @@ export default React.createClass({
    * Start listening updating list of slides
    */
   componentDidMount() {
-    PresViewStore.addSlideListListener(this.onNewSlides);
-    PresViewStore.addCurrentSlideListener(this.onSetDisplayed);
+    PresViewStore.addSlideListListener(this.onUpdateSlides);
+    PresViewStore.addCurrentSlideListener(this.onUpdateSlides);
   },
   
   /**
@@ -29,8 +29,8 @@ export default React.createClass({
    * Stop listening updating list of slides
    */
   componentWillUnmount() {
-    PresViewStore.removeSlideListListener(this.onNewSlides);
-    PresViewStore.removeCurrentSlideListener(this.onSetDisplayed);
+    PresViewStore.removeSlideListListener(this.onUpdateSlides);
+    PresViewStore.removeCurrentSlideListener(this.onUpdateSlides);
   },
   
   /**
@@ -56,22 +56,12 @@ export default React.createClass({
   },
   
   /**
-   * Update slides
+   * Update previews
    */
-  onNewSlides() {
+  onUpdateSlides() {
     this.setState({
       items: PresViewStore.getSlides(),
-      displayedItem: this.state.displayedItem
-    });
-  },
-  
-  /**
-   * Changing displayed slide
-   */
-  onSetDisplayed(currentSlide) {
-    this.setState({
-      items: this.state.items,
-      displayedItem: currentSlide
+      displayedItem: PresViewStore.getCurrentSlide()
     });
   }
 });

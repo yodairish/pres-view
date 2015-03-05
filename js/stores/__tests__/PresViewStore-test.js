@@ -61,7 +61,8 @@ describe('Store for view presentation', () => {
     
     expect(slideListCallback.mock.calls.length).toBe(1);
     expect(PresViewStore.getSlides()).toEqual(slides);
-    expect(currentSlideCallback.mock.calls[0][0]).toBe(0);
+    expect(currentSlideCallback.mock.calls.length).toBe(1);
+    expect(PresViewStore.getCurrentSlide()).toBe(0);
     expect(progressCallback.mock.calls[0][0]).toBe(25);
   });
   
@@ -78,7 +79,8 @@ describe('Store for view presentation', () => {
       slideNumber: 2
     });
     
-    expect(currentSlideCallback.mock.calls[1][0]).toBe(2);
+    expect(currentSlideCallback.mock.calls.length).toBe(2);
+    expect(PresViewStore.getCurrentSlide()).toBe(2);
     expect(progressCallback.mock.calls[1][0]).toBe(75);
   });
   

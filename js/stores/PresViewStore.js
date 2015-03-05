@@ -7,6 +7,7 @@ import appDispatcher from '../dispatcher/appDispatcher.js';
 var slides = [],
     presentationId = -1,
     currentSlide = 0,
+    fullscreen = false,
     PresViewStore;
 
 PresViewStore = Object.assign({}, EventEmitter.prototype, {
@@ -76,7 +77,7 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
    * call all changing current slide callbacks
    */
   emitCurrentSlide() {
-    this.emit(STORES_PRES_VIEW.CURRENT_SLIDE, currentSlide);
+    this.emit(STORES_PRES_VIEW.CURRENT_SLIDE);
   },
 
   /**
@@ -98,6 +99,35 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
   // ========================================
   
   /**
+   * ============ FULL SCREEN STATUS EVENTS ============
+   */
+  
+  /**
+   * call all changing fullscreen callbacks
+   */
+  emitFullscreen() {
+    this.emit(STORES_PRES_VIEW.CURRENT_SLIDE);
+  },
+
+  /**
+   * Add new listener for changing fullscreen
+   * @param {function} callback
+   */
+  addFullscreenListener(callback) {
+    this.on(STORES_PRES_VIEW.CURRENT_SLIDE, callback);
+  },
+  
+  /**
+   * Remove listener for changing fullscreen
+   * @param {function} callback
+   */
+  removeFullscreenListener(callback) {
+    this.removeListener(STORES_PRES_VIEW.CURRENT_SLIDE, callback);
+  },
+  
+  // ========================================
+  
+  /**
    * Get all slides
    * @return {array}
    */
@@ -107,10 +137,10 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
   
   /**
    * Get image for current slide
-   * @return {string}
+   * @return {number}
    */
-  getCurrentSlideImg() {
-    return slides[currentSlide] || '';
+  getCurrentSlide() {
+    return currentSlide;
   },
   
   /**
@@ -127,6 +157,14 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
    */
   getId() {
     return presentationId;
+  },
+  
+  /**
+   * Get current fullscreen status
+   * @returns {boolean}
+   */
+  getFullscreeStatus() {
+    return fullscreen;
   }
 });
 
@@ -154,6 +192,12 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
         PresViewStore.emitProgress();
       }
       
+      break;
+    }
+    case ACTIONS_PRES_VIEW.FULL_SCREEN: {
+      fullscreen = !!action.status;
+      
+      PresViewStore.emitFullscreen();
       break;
     }
   }

@@ -74,6 +74,6 @@ describe('SideControls component', () => {
         
     TestUtils.Simulate.click(fullscreenButton);
         
-    expect(ViewPresActions.fullscreen.mock.calls.length).toBe(1);
+    expect(ViewPresActions.fullscreen.mock.calls[0][0]).toBeTruthy();
   });
 });

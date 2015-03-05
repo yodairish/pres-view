@@ -48,10 +48,12 @@ export default {
   
   /**
    * Open presentation in full screen mode
+   * @param {boolean} status
    */
-  fullscreen() {
+  fullscreen(status) {
     appDispatcher.dispatch({
-      type: ACTIONS_PRES_VIEW.FULL_SCREEN
+      type: ACTIONS_PRES_VIEW.FULL_SCREEN,
+      status: status
     });
   },
   
