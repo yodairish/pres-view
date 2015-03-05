@@ -74,11 +74,15 @@
   font-size: var(--fontSize-display-1);
 }
 
+@define-mixin font-headline-noColor {
+  font-family: var(--fontFamily-headline);
+  font-size: var(--fontSize-headline);
+}
+
 @define-mixin font-headline {
   color: var(--fontColor-headline);
 
-  font-family: var(--fontFamily-headline);
-  font-size: var(--fontSize-headline);
+  @mixin font-headline-noColor;
 }
 
 @define-mixin font-title {

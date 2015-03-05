@@ -3,6 +3,7 @@
 import {EventEmitter} from 'events';
 import {ACTIONS_PRES_VIEW, STORES_PRES_VIEW} from '../constants.js';
 import appDispatcher from '../dispatcher/appDispatcher.js';
+import loader from '../utils/loader.js';
 
 var slides = [],
     presentationId = -1,
@@ -212,8 +213,9 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
       presentationId = action.id;
       visibility = true;
       PresViewStore.emitVisibility();
+      
+      loader.getSlides(presentationId);
       break;
-      // load slides
     }
     case ACTIONS_PRES_VIEW.CLOSE: {
       visibility = false;
@@ -227,6 +229,13 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
       PresViewStore.emitSlideList();
       PresViewStore.emitCurrentSlide();
       PresViewStore.emitProgress();
+      break;
+    }
+    case ACTIONS_PRES_VIEW.GET_SLIDES_ERROR: {
+      // do something
+      visibility = false;
+      PresViewStore.emitVisibility();
+      
       break;
     }
     case ACTIONS_PRES_VIEW.SHOW_SLIDE: {

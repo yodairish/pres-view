@@ -8,6 +8,7 @@ describe('Store for view presentation', () => {
   var appDispatcher,
       PresViewStore,
       callback,
+      loader,
       slideListCallback,
       progressCallback,
       currentSlideCallback,
@@ -17,6 +18,7 @@ describe('Store for view presentation', () => {
   beforeEach(() => {
     appDispatcher = require('../../dispatcher/appDispatcher.js');
     PresViewStore = require('../PresViewStore.js');
+    loader = require('../../utils/loader.js');
     
     callback = appDispatcher.register.mock.calls[0][0];
     
@@ -72,6 +74,14 @@ describe('Store for view presentation', () => {
     expect(progressCallback.mock.calls[0][0]).toBe(25);
   });
   
+  it('Error until getting slides', () => {
+    callback({
+      type: ACTIONS_PRES_VIEW.GET_SLIDES_ERROR
+    });
+    
+    expect(PresViewStore.getVisibility()).toBeFalsy();
+  });
+  
   it('Show new slide', () => {
     var slides = [{}, {}, {}, {}];
     
@@ -100,6 +110,7 @@ describe('Store for view presentation', () => {
     
     expect(PresViewStore.getId()).toBe(id);
     expect(PresViewStore.getVisibility()).toBeTruthy();
+    expect(loader.getSlides.mock.calls[0][0]).toBe(id);
   });
   
   it('Close presentation', () => {

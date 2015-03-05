@@ -1,27 +1,27 @@
 [
   {
-    "id": 15,
+    "id": 1,
     "img": "./pres/images/pres.jpg",
     "title": "some title"
   },
   {
-    "id": 21,
+    "id": 2,
     "img": "./pres/images/pres.jpg",
     "title": "some title 22",
     "favorite": true
   },
   {
-    "id": 10,
+    "id": 3,
     "img": "./pres/images/pres.jpg",
     "title": "some title 33"
   },
   {
-    "id": 23,
+    "id": 4,
     "img": "./pres/images/pres.jpg",
     "title": "some title 44"
   },
   {
-    "id": 43,
+    "id": 5,
     "img": "./pres/images/pres.jpg",
     "title": "some title 55",
     "favorite": true

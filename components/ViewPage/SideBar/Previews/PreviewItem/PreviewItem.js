@@ -21,13 +21,17 @@ export default React.createClass({
         itemClasses = cx({
           'preview-item': true,
           'preview-item--displayed': this.props.displayed
-        });
+        }),
+        inlineImg = {
+          backgroundImage: 'url(' + this.props.img + ')'
+        };
     
     return (
       <div className={itemClasses}
            onClick={this.onClick}>
-        <img className="preview-img"
-             src={this.props.img} />
+        <span className="preview-img"
+              style={inlineImg}>
+        </span>
         <span className="preview-position">
           {this.props.position}
         </span>

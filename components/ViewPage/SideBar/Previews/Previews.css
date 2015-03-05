@@ -1,0 +1,17 @@
+.preview {
+  display: flex;
+  width: 100%;
+  height: calc(100% - 50px);
+  padding-top: 10px;
+  overflow-y: auto;
+
+  flex-flow: row wrap;
+  align-content: flex-start;
+  justify-content: space-around;
+}
+
+@media only screen and (max-width : 400px) {
+  .preview {
+    display: none;
+  }
+}

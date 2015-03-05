@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React from 'react/addons';
 import ProgressBar from './ProgressBar/ProgressBar.js';
 import PresControls from './PresControls/PresControls.js';
 import PresViewStore from '../../../js/stores/PresViewStore.js';
@@ -10,12 +10,11 @@ export default React.createClass({
    * Set default state
    */
   getInitialState() {
-    var slide = PresViewStore.getCurrentSlide(),
-        slides = PresViewStore.getSlides();
+    var slide = PresViewStore.getCurrentSlide();
     
     return {
       slide: slide,
-      img: slides[slide],
+      img: getImage(slide),
       fullscreen: PresViewStore.getFullscreeStatus()
     };
   },
@@ -44,18 +43,25 @@ export default React.createClass({
    * Rendering component to html
    */
   render() {
-    var controls = '';
+    var cx = React.addons.classSet,
+        presentationClasses = cx({
+          presentation: true,
+          'presentation--fullscreen': this.state.fullscreen
+        }),
+        inlineImg = {
+          backgroundImage: 'url(' + this.state.img + ')'
+        },
+        controls = '';
     
     if (this.state.fullscreen) {
       controls = <PresControls />;
     }
     
     return (
-      <div className="presentation">
+      <div className={presentationClasses}
+           style={inlineImg}>
         <ProgressBar />
         {controls}
-        <img className="presentation-img"
-             src={this.state.img} />
       </div>
     );
   },
@@ -64,12 +70,11 @@ export default React.createClass({
    * Updating showing slide
    */
   onUpdateSlide() {
-    var slide = PresViewStore.getCurrentSlide(),
-        slides = PresViewStore.getSlides();
+    var slide = PresViewStore.getCurrentSlide();
     
     this.setState({
       slide: slide,
-      img: slides[slide],
+      img: getImage(slide),
       fullscreen: this.state.fullscreen
     });
   },
@@ -85,3 +90,15 @@ export default React.createClass({
     });
   }
 });
+
+/**
+ * Get image for slide
+ */
+function getImage(slide) {
+  var slides = PresViewStore.getSlides(),
+      slideObj = slides[slide];
+  
+  return (slideObj && slideObj.img ?
+          slideObj.img :
+          '');
+}

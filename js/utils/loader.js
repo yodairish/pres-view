@@ -2,6 +2,7 @@
 
 import 'whatwg-fetch';
 import PresListActions from '../actions/PresListActions.js';
+import ViewPresActions from '../actions/ViewPresActions.js';
 
 var fetch = self.fetch;
 
@@ -15,10 +16,25 @@ export default {
     var url = './pres/presList' + (count ? count : '') + '.json';
     
     fetch(url)
-      .then(handleNewItemsResponse)
+      .then(handleResponse)
       .then(handleNewItems)
       .catch((error) => {
         PresListActions.getNewItemsError(error);
+      });
+  },
+  
+  /**
+   * Get slide for presentation
+   * @param {number} id
+   */
+  getSlides(id) {
+    var url = './pres/slides/slides' + id + '.json';
+    
+    fetch(url)
+      .then(handleResponse)
+      .then(handleSlides)
+      .catch((error) => {
+        ViewPresActions.getSlidesError(error);
       });
   },
   
@@ -34,11 +50,11 @@ export default {
 };
 
 /**
- * Handle getting new items
+ * Handle response
  * @param {Object} response
  * @return {object|array}
  */
-function handleNewItemsResponse(response) {
+function handleResponse(response) {
   if (response.status >= 200 && response.status < 300) {
     return response.json();
     
@@ -58,6 +74,21 @@ function handleNewItems(items) {
   } else {
     PresListActions.getNewItemsError({
       message: 'Incorrect items list'
+    });
+  }
+}
+
+/**
+ * Handle array with slides
+ * @param {array|object} slides
+ */
+function handleSlides(slides) {
+  if (Array.isArray(slides)) {
+    ViewPresActions.getSlides(slides);
+    
+  } else {
+    ViewPresActions.getSlides({
+      message: 'Incorrect slides list'
     });
   }
 }

@@ -111,3 +111,128 @@
     transform: translateZ(0) rotateZ(360deg);
   }
 }
+
+/**
+ *  Back arrow
+ */
+
+.back-arrow:before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: rotateZ(-45deg) skew(10deg, 10deg) translate(3px,3px);
+
+  width: 15px;
+  height: 15px;
+  margin: auto;
+  border-top: 3px solid var(--color-blank);
+  border-left: 3px solid var(--color-blank);
+
+  content: '';
+}
+
+/**
+ *  Full screen
+ */
+
+.fullscreen > span {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translate(-10px, -10px);
+
+  width: 1px;
+  height: 1px;
+  margin: auto;
+}
+
+.fullscreen > span:before {
+  position: absolute;
+
+  width: 5px;
+  height: 5px;
+  border-top: 2px solid var(--color-blank);
+  border-left: 2px solid var(--color-blank);
+
+  content: '';
+}
+
+.fullscreen > span:after {
+  position: absolute;
+  transform: rotateZ(45deg) translate(2px,2.5px);
+
+  width: 9px;
+  height: 2px;
+
+  background-color: var(--color-blank);
+
+  content: '';
+}
+
+.fullscreen > span:nth-child(2) {
+  transform: rotateZ(90deg) translate(-10px, -10px);
+}
+
+.fullscreen > span:nth-child(3) {
+  transform: rotateZ(180deg) translate(-10px, -10px);
+}
+
+.fullscreen > span:nth-child(4) {
+  transform: rotateZ(270deg) translate(-10px, -10px);
+}
+
+/**
+ *  Close full screen
+ */
+
+.close-fullscreen > span {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translate(-8px,-8px);
+
+  width: 1px;
+  height: 1px;
+  margin: auto;
+}
+
+.close-fullscreen > span:before {
+  position: absolute;
+
+  width: 5px;
+  height: 5px;
+  border-right: 2px solid var(--color-blank);
+  border-bottom: 2px solid var(--color-blank);
+
+  content: '';
+}
+
+.close-fullscreen > span:after {
+  position: absolute;
+  transform: rotateZ(45deg) translate(-1px,3.2px);
+
+  width: 9px;
+  height: 2px;
+
+  background-color: var(--color-blank);
+
+  content: '';
+}
+
+.close-fullscreen > span:nth-child(2) {
+  transform: rotateZ(90deg) translate(-7px,-7px);
+}
+
+.close-fullscreen > span:nth-child(3) {
+  transform: rotateZ(180deg) translate(-6px,-8px);
+}
+
+.close-fullscreen > span:nth-child(4) {
+  transform: rotateZ(270deg) translate(-7px,-9px);
+}

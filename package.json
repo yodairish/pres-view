@@ -36,6 +36,7 @@
     "keymirror": "^0.1.1",
     "merge-stream": "^0.1.7",
     "pleeease-filters": "^1.0.0",
+    "postcss-calc": "^4.0.0",
     "postcss-custom-properties": "^3.0.1",
     "postcss-import": "^5.0.3",
     "postcss-mixins": "^0.1.1",

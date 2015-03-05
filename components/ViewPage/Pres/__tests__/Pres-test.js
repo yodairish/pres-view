@@ -11,10 +11,11 @@ import PresViewStore from '../../../../js/stores/PresViewStore.js';
 var TestUtils = React.addons.TestUtils;
 
 describe('Pres component', () => {
-  var slides = [
-        'startImage.jpg',
-        'other.jpg'
-      ],
+  var slides = [{
+        img: 'startImage.jpg'
+      }, {
+        img: 'other.jpg'
+      }],
       pres;
   
   beforeEach(() => {
@@ -33,25 +34,30 @@ describe('Pres component', () => {
   it('Initialize with current image', () => {
     var image = TestUtils.findRenderedDOMComponentWithClass(
           pres,
-          'presentation-img'
-        );
+          'presentation'
+        ),
+        imageUrl = image.props.style.backgroundImage
+                                    .replace(/(url|[()'"]+)/g, '');
         
-    expect(image.props.src).toBe(slides[0]);
+    expect(imageUrl).toBe(slides[0].img);
   });
   
   it('Update image when change slide', () => {
-    var image;
+    var image,
+        imageUrl;
     
     PresViewStore.getCurrentSlide.mockReturnValue(1);
     PresViewStore.addCurrentSlideListener.mock.calls[0][0]();
     
     image = TestUtils.findRenderedDOMComponentWithClass(
       pres,
-      'presentation-img'
+      'presentation'
     );
+    imageUrl = image.props.style.backgroundImage
+                                .replace(/(url|[()'"]+)/g, '');
     
     // // FIXME some reason it's don't changed here..
-    // expect(image.props.src).toBe(slides[1]);
+    // expect(imageUrl).toBe(slides[1].img);
   });
   
   it('Show controls in fullscreen mode', () => {
@@ -71,5 +77,24 @@ describe('Pres component', () => {
     );
     
     expect(controls.length).toBe(1);
+  });
+  
+  it('Mark with class in fullscreen mode', () => {
+    var presentation = TestUtils.findRenderedDOMComponentWithClass(
+          pres,
+          'presentation'
+        ).getDOMNode();
+    
+    expect(presentation.className).not.toContain('presentation--fullscreen');
+    
+    PresViewStore.getFullscreeStatus.mockReturnValue(true);
+    PresViewStore.addFullscreenListener.mock.calls[0][0]();
+    
+    presentation = TestUtils.findRenderedDOMComponentWithClass(
+      pres,
+      'presentation'
+    ).getDOMNode();
+    
+    expect(presentation.className).toContain('presentation--fullscreen');
   });
 });

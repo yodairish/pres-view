@@ -1,0 +1,44 @@
+@import '../../../css/variables/indents.css';
+@import '../../../css/variables/zIndex.css';
+@import '../../../css/variables/colors.css';
+
+.presentation {
+  position: absolute;
+  top: 0;
+  right: var(--indent-sideBar);
+  bottom: 0;
+  left: 0;
+
+  overflow: hidden;
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.presentation--fullscreen {
+  right: 0;
+
+  background-color: var(--color-dark);
+}
+
+@media only screen and (max-width : 1000px) {
+  .presentation {
+    right: calc(var(--indent-sideBar) / 2);
+  }
+  
+  .presentation--fullscreen {
+    right: 0;
+  }
+}
+
+@media only screen and (max-width : 400px) {
+  .presentation {
+    top: 50px;
+    right: 0;
+  }
+
+  .presentation--fullscreen {
+    top: 0;
+  }
+}

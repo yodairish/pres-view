@@ -42,11 +42,12 @@ export default React.createClass({
         favoritesClasses = cx({
           'control-button': true,
           'control--active': this.state.favorite
-        });
+        }),
+        backClasses = 'control-button sideControls-back';
     
     return (
       <div className="sideControls">
-        <span className="control-button"
+        <span className={backClasses}
               onClick={this.onClose}>
           <span className="back-arrow"></span>
         </span>
@@ -56,7 +57,12 @@ export default React.createClass({
         </span>
         <span className="control-button"
               onClick={this.onFullScreen}>
-          <span className="fullscreen"></span>
+          <span className="fullscreen">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
         </span>
       </div>
     );

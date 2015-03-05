@@ -37,13 +37,19 @@ export default React.createClass({
    * Rendering component to html
    */
   render() {
+    var closeFullScreen = 'presControls-button close-fullscreen';
+    
     return (
       <div className="presControls">
         <span className="presControls-slides">
           {this.state.slide}/{this.state.count}
         </span>
-        <span className="presControls-button"
+        <span className={closeFullScreen}
               onClick={this.onCloseFullscreen}>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </span>
       </div>
     );

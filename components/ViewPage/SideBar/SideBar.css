@@ -1,0 +1,26 @@
+@import '../../../css/variables/indents.css';
+
+.sideBar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  width: var(--indent-sideBar);
+  overflow: hidden;
+}
+
+@media only screen and (max-width : 1000px) {
+  .sideBar {
+    width: calc(var(--indent-sideBar) / 2);
+  }
+}
+
+@media only screen and (max-device-width : 400px) {
+  .sideBar {
+    bottom: auto;
+
+    width: 100%;
+    height: 50px;
+  }
+}

@@ -15,6 +15,7 @@ const ACTIONS_PRES_LIST = keyMirror({
                             CLOSE: null,
                             SHOW_SLIDE: null,
                             GET_SLIDES: null,
+                            GET_SLIDES_ERROR: null,
                             FULL_SCREEN: null,
                             TOGGLE_FAVORITE: null
                           }),

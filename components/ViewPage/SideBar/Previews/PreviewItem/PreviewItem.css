@@ -1,0 +1,54 @@
+@import '../../../../../css/variables/indents.css';
+@import '../../../../../css/variables/colors.css';
+@import '../../../../../css/variables/fonts.css';
+
+:root {
+  --preview-item-size: calc((var(--indent-sideBar) / 2) - 20px);
+}
+
+.preview-item {
+  position: relative;
+
+  width: var(--preview-item-size);
+  height: calc(var(--preview-item-size) * .75);
+  margin-bottom: 10px;
+  overflow: hidden;
+
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.preview-item--displayed {
+  outline: 3px solid #ff7043;
+}
+
+.preview-img {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+
+  filter: grayscale(1);
+}
+
+.preview-item--displayed .preview-img {
+  filter: grayscale(0);
+}
+
+.preview-position {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+
+  padding: 10px 15px;
+
+  background-color: var(--color-secondary);
+
+  text-align: center;
+  @mixin font-body-2;
+}

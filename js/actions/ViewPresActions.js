@@ -36,6 +36,17 @@ export default {
   },
   
   /**
+   * Create action for error until getting slides
+   * @param {object} error
+   */
+  getSlidesError(error) {
+    appDispatcher.dispatch({
+      type: ACTIONS_PRES_VIEW.GET_SLIDES_ERROR,
+      error: error
+    });
+  },
+  
+  /**
    * Show picked slide
    * @param {number} slideNumber
    */
