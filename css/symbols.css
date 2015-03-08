@@ -236,3 +236,73 @@
 .close-fullscreen > span:nth-child(4) {
   transform: rotateZ(270deg) translate(-7px,-9px);
 }
+
+.sandwich {
+  top: 50%;
+  left: 25%;
+
+  margin-top: -1.5px;
+}
+
+.sandwich,
+.sandwich:before,
+.sandwich:after {
+  position: absolute;
+
+  display: inline-block;
+  width: 20px;
+  height: 3px;
+
+  background-color: var(--color-blank);
+}
+
+.sandwich:before,
+.sandwich:after {
+  left: 0;
+
+  content: '';
+}
+
+.sandwich:before {
+  transform: translateY(-250%);
+}
+
+.sandwich:after {
+  transform: translateY(250%);
+}
+
+.sandwich-close {
+  top: 50%;
+  left: 25%;
+
+  margin-top: -1.5px;
+
+  background-color: transparent;
+}
+
+.sandwich-close,
+.sandwich-close:before,
+.sandwich-close:after {
+  position: absolute;
+
+  display: inline-block;
+  width: 20px;
+  height: 3px;
+}
+
+.sandwich-close:before,
+.sandwich-close:after {
+  left: 0;
+
+  background-color: var(--color-blank);
+
+  content: '';
+}
+
+.sandwich-close:before {
+  transform: translateY(0) rotate(45deg);
+}
+
+.sandwich-close:after {
+  transform: translateY(0) rotate(-45deg);
+}

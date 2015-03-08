@@ -7,6 +7,7 @@ import React from 'react/addons';
 import Pres from '../Pres.js';
 import PresControls from '../PresControls/PresControls.js';
 import PresViewStore from '../../../../js/stores/PresViewStore.js';
+import ViewPresActions from '../../../../js/actions/ViewPresActions.js';
 
 var TestUtils = React.addons.TestUtils;
 
@@ -22,6 +23,7 @@ describe('Pres component', () => {
     PresViewStore.getCurrentSlide.mockReturnValue(0);
     PresViewStore.getSlides.mockReturnValue(slides);
     PresViewStore.getFullscreeStatus.mockReturnValue(false);
+    ViewPresActions.next.mockClear();
     
     PresViewStore.addCurrentSlideListener.mockClear();
     PresViewStore.addFullscreenListener.mockClear();
@@ -96,5 +98,16 @@ describe('Pres component', () => {
     ).getDOMNode();
     
     expect(presentation.className).toContain('presentation--fullscreen');
+  });
+  
+  it('Call next slide on click', () => {
+    var presentation = TestUtils.findRenderedDOMComponentWithClass(
+          pres,
+          'presentation'
+        );
+        
+    TestUtils.Simulate.click(presentation);
+    
+    expect(ViewPresActions.next.mock.calls.length).toBe(1);
   });
 });

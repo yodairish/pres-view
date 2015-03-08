@@ -57,8 +57,11 @@ export default React.createClass({
   
   /**
    * Quit from full screen mode
+   * @param {object} e
    */
-  onCloseFullscreen() {
+  onCloseFullscreen(e) {
+    e.stopPropagation();
+    
     ViewPresActions.fullscreen(false);
   },
   

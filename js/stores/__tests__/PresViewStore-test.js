@@ -128,5 +128,44 @@ describe('Store for view presentation', () => {
     });
     
     expect(PresViewStore.getFullscreeStatus()).toBeTruthy();
-  }); 
+  });
+  
+  it('Show next slide', () => {
+    var slides = [{}, {}, {}, {}];
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.GET_SLIDES,
+      slides: slides
+    });
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.NEXT
+    });
+    
+    expect(currentSlideCallback.mock.calls.length).toBe(2);
+    expect(PresViewStore.getCurrentSlide()).toBe(1);
+    expect(progressCallback.mock.calls[1][0]).toBe(50);
+  });
+  
+  it('Show previous slide', () => {
+    var slides = [{}, {}, {}, {}];
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.GET_SLIDES,
+      slides: slides
+    });
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.SHOW_SLIDE,
+      slideNumber: 2
+    });
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.PREV
+    });
+    
+    expect(currentSlideCallback.mock.calls.length).toBe(3);
+    expect(PresViewStore.getCurrentSlide()).toBe(1);
+    expect(progressCallback.mock.calls[2][0]).toBe(50);
+  });
 });

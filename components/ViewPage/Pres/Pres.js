@@ -4,6 +4,7 @@ import React from 'react/addons';
 import ProgressBar from './ProgressBar/ProgressBar.js';
 import PresControls from './PresControls/PresControls.js';
 import PresViewStore from '../../../js/stores/PresViewStore.js';
+import ViewPresActions from '../../../js/actions/ViewPresActions.js';
 
 export default React.createClass({
   /**
@@ -52,14 +53,16 @@ export default React.createClass({
           backgroundImage: 'url(' + this.state.img + ')'
         },
         controls = '';
-    
+        
     if (this.state.fullscreen) {
       controls = <PresControls />;
     }
     
     return (
       <div className={presentationClasses}
-           style={inlineImg}>
+           ref="presentation"
+           style={inlineImg}
+           onClick={this.onNext}>
         <ProgressBar />
         {controls}
       </div>
@@ -75,7 +78,7 @@ export default React.createClass({
     this.setState({
       slide: slide,
       img: getImage(slide),
-      fullscreen: this.state.fullscreen
+      fullscreen: PresViewStore.getFullscreeStatus()
     });
   },
   
@@ -83,12 +86,66 @@ export default React.createClass({
    * Update fullscreen status
    */
   onFullscreen() {
+    var status = PresViewStore.getFullscreeStatus();
+    
     this.setState({
       slide: this.state.slide,
       img: this.state.img,
-      fullscreen: PresViewStore.getFullscreeStatus()
+      fullscreen: status
     });
-  }
+    
+    if (status) {
+      this.requestFullscreen();
+      
+    } else {
+      this.exitFullscreen();
+    }
+  },
+  
+  /**
+   * Call for next slide
+   */
+   onNext() {
+     ViewPresActions.next();
+   },
+   
+   /**
+    * Request fullscreen mode
+    */
+    requestFullscreen() {
+      var elem = this.refs.presentation.getDOMNode();
+      
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+        
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+        
+      } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+        
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      }
+    },
+    
+    /**
+     * Exit from fullscreen mode
+     */
+    exitFullscreen() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+        
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+        
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
 });
 
 /**

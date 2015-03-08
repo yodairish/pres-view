@@ -63,8 +63,11 @@ export default React.createClass({
   
   /**
    * Add/remove current presentation to favorites
+   * @param {object} e
    */
-  addToFavorites() {
+  addToFavorites(e) {
+    e.stopPropagation();
+    
     PresListActions.toggleFavoriteStatus(this.props.id);
   }
 });

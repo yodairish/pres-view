@@ -4,6 +4,7 @@
 
 .presentation {
   position: absolute;
+  z-index: var(--zIndex-1);
   top: 0;
   right: var(--indent-sideBar);
   bottom: 0;
@@ -26,7 +27,7 @@
   .presentation {
     right: calc(var(--indent-sideBar) / 2);
   }
-  
+
   .presentation--fullscreen {
     right: 0;
   }
@@ -34,11 +35,6 @@
 
 @media only screen and (max-width : 400px) {
   .presentation {
-    top: 50px;
     right: 0;
-  }
-
-  .presentation--fullscreen {
-    top: 0;
   }
 }

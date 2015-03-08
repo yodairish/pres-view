@@ -64,4 +64,20 @@ describe('Action creator for presentation view', () => {
     expect(action.type).toBe(ACTIONS_PRES_VIEW.FULL_SCREEN);
     expect(action.status).toBeTruthy();
   });
+  
+  it('Call for next slide', () => {
+    PresListActions.next();
+    
+    var action = appDispatcher.dispatch.mock.calls[0][0];
+    
+    expect(action.type).toBe(ACTIONS_PRES_VIEW.NEXT);
+  });
+  
+  it('Call for previous slide', () => {
+    PresListActions.prev();
+    
+    var action = appDispatcher.dispatch.mock.calls[0][0];
+    
+    expect(action.type).toBe(ACTIONS_PRES_VIEW.PREV);
+  });
 });

@@ -1,3 +1,5 @@
+@import '../../../../css/variables/zIndex.css';
+
 .sideControls {
   width: 100%;
   height: 40px;
@@ -11,10 +13,72 @@
   float: left;
 }
 
+.sideControls .sideControls-menu {
+  display: none;
+}
+
 @media only screen and (max-width : 1000px) {
   .sideControls {
     display: flex;
 
     justify-content: space-between;
+  }
+}
+
+@media only screen and (max-device-width : 400px) {
+  .sideControls {
+    height: 100%;
+  }
+
+  .sideControls .sideControls-menu {
+    display: inline-block;
+  }
+
+  .sideControls .sideControls-menu span {
+    transition: background-color .3s;
+  }
+
+  .sideControls .sideControls-menu span:before,
+  .sideControls .sideControls-menu span:after {
+    transition: transform .3s;
+  }
+
+  .sideControls .control-button {
+    position: absolute;
+    z-index: var(--zIndex-2);
+    right: 40px;
+    bottom: 40px;
+    transform: scale(2);
+
+    margin-right: 0;
+    margin-left: 0;
+
+    transition: box-shadow .2s, transform .3s, visibility .2s;
+  }
+
+  .sideControls .control-button:nth-child(1),
+  .sideControls .control-button:nth-child(2),
+  .sideControls .control-button:nth-child(3) {
+    z-index: var(--zIndex-1);
+
+    visibility: hidden;
+  }
+
+  .sideControls.sideControls--active .control-button:nth-child(1),
+  .sideControls.sideControls--active .control-button:nth-child(2),
+  .sideControls.sideControls--active .control-button:nth-child(3) {
+    visibility: visible;
+  }
+
+  .sideControls.sideControls--active .control-button:nth-child(1) {
+    transform: translateX(-90px) scale(2);
+  }
+
+  .sideControls.sideControls--active .control-button:nth-child(2) {
+    transform: translate(-90px, -90px) scale(2);
+  }
+
+  .sideControls.sideControls--active .control-button:nth-child(3) {
+    transform: translateY(-90px) scale(2);
   }
 }

@@ -47,8 +47,8 @@ export default React.createClass({
    * Rendering component to html
    */
   render() {
-    var items = this.state.items.map((item) => {
-      return <ListPresItem key={item.id}
+    var items = this.state.items.map((item, index) => {
+      return <ListPresItem key={item.id + '-' + index}
                            id={item.id}
                            title={item.title}
                            img={item.img}

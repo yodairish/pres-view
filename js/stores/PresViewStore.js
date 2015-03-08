@@ -4,6 +4,7 @@ import {EventEmitter} from 'events';
 import {ACTIONS_PRES_VIEW, STORES_PRES_VIEW} from '../constants.js';
 import appDispatcher from '../dispatcher/appDispatcher.js';
 import loader from '../utils/loader.js';
+import keyController from '../utils/keyController.js';
 
 var slides = [],
     presentationId = -1,
@@ -208,6 +209,8 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
 });
 
 PresViewStore.dispatchToken = appDispatcher.register((action) => {
+  console.log('dispatcher action', action);
+  
   switch (action.type) {
     case ACTIONS_PRES_VIEW.OPEN: {
       presentationId = action.id;
@@ -215,11 +218,13 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
       PresViewStore.emitVisibility();
       
       loader.getSlides(presentationId);
+      keyController.startListen();
       break;
     }
     case ACTIONS_PRES_VIEW.CLOSE: {
       visibility = false;
       PresViewStore.emitVisibility();
+      keyController.stopListen();
       break;
     }
     case ACTIONS_PRES_VIEW.GET_SLIDES: {
@@ -252,6 +257,26 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
       fullscreen = !!action.status;
       
       PresViewStore.emitFullscreen();
+      break;
+    }
+    case ACTIONS_PRES_VIEW.NEXT: {
+      if (currentSlide < (PresViewStore.getCount() - 1)) {
+        currentSlide++;
+        
+        PresViewStore.emitCurrentSlide();
+        PresViewStore.emitProgress();
+      }
+      
+      break;
+    }
+    case ACTIONS_PRES_VIEW.PREV: {
+      if (currentSlide > 0) {
+        currentSlide--;
+        
+        PresViewStore.emitCurrentSlide();
+        PresViewStore.emitProgress();
+      }
+      
       break;
     }
   }

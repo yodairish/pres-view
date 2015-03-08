@@ -14,7 +14,8 @@ export default React.createClass({
     return {
       favorite: PresListStore.isFavoritePresentation(
                   PresViewStore.getId()
-                )
+                ),
+      menu: false
     };
   },
   
@@ -39,14 +40,23 @@ export default React.createClass({
    */
   render() {
     var cx = React.addons.classSet,
+        sideControlsClasses = cx({
+          sideControls: true,
+          'sideControls--active': this.state.menu
+        }),
         favoritesClasses = cx({
           'control-button': true,
           'control--active': this.state.favorite
         }),
-        backClasses = 'control-button sideControls-back';
+        sandwich = cx({
+          sandwich: !this.state.menu,
+          'sandwich-close': this.state.menu
+        }),
+        backClasses = 'control-button sideControls-back',
+        menuClasses = 'control-button sideControls-menu';
     
     return (
-      <div className="sideControls">
+      <div className={sideControlsClasses}>
         <span className={backClasses}
               onClick={this.onClose}>
           <span className="back-arrow"></span>
@@ -64,6 +74,10 @@ export default React.createClass({
             <span></span>
           </span>
         </span>
+        <span className={menuClasses}
+              onClick={this.onToggleMenu}>
+          <span className={sandwich}></span>
+        </span>
       </div>
     );
   },
@@ -75,7 +89,8 @@ export default React.createClass({
     this.setState({
       favorite: PresListStore.isFavoritePresentation(
                   PresViewStore.getId()
-                )
+                ),
+      menu: this.state.menu
     });
   },
   
@@ -98,5 +113,15 @@ export default React.createClass({
    */
   onFullScreen() {
     ViewPresActions.fullscreen(true);
+  },
+  
+  /**
+   * Toggle active mobile menu
+   */
+  onToggleMenu() {
+    this.setState({
+      favorite: this.state.favorite,
+      menu: !this.state.menu
+    });
   }
 });

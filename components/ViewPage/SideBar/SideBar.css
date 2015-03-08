@@ -18,9 +18,6 @@
 
 @media only screen and (max-device-width : 400px) {
   .sideBar {
-    bottom: auto;
-
-    width: 100%;
-    height: 50px;
+    /*width: 120px;*/
   }
 }

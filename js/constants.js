@@ -17,7 +17,9 @@ const ACTIONS_PRES_LIST = keyMirror({
                             GET_SLIDES: null,
                             GET_SLIDES_ERROR: null,
                             FULL_SCREEN: null,
-                            TOGGLE_FAVORITE: null
+                            TOGGLE_FAVORITE: null,
+                            NEXT: null,
+                            PREV: null
                           }),
       STORES_PRES_LIST = keyMirror({
                             CHANGE: null

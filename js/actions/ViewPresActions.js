@@ -75,5 +75,23 @@ export default {
     appDispatcher.dispatch({
       type: ACTIONS_PRES_VIEW.TOGGLE_FAVORITE
     });
+  },
+  
+  /**
+   * Call for next slide
+   */
+  next() {
+    appDispatcher.dispatch({
+      type: ACTIONS_PRES_VIEW.NEXT
+    });
+  },
+  
+  /**
+   * Call for previous slide
+   */
+  prev() {
+    appDispatcher.dispatch({
+      type: ACTIONS_PRES_VIEW.PREV
+    });
   }
 };
