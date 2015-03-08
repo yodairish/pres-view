@@ -11,7 +11,9 @@ export default React.createClass({
    * Set default state
    */
   getInitialState() {
-    PresListActions.loadMore();
+    if (!PresListStore.getCount()) {
+      PresListActions.loadMore();
+    }
     
     return {
       items: PresListStore.getAll()

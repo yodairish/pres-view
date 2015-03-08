@@ -76,4 +76,21 @@ describe('SideControls component', () => {
         
     expect(ViewPresActions.fullscreen.mock.calls[0][0]).toBeTruthy();
   });
+  
+  it('Active menu on click mobile menu sandwich', () => {
+    var sideControlsElem = TestUtils.findRenderedDOMComponentWithClass(
+          sideControls,
+          'sideControls'
+        ).getDOMNode(),
+        sandwichButton = TestUtils.findRenderedDOMComponentWithClass(
+          sideControls,
+          'sandwich'
+        ).getDOMNode();
+
+    expect(sideControlsElem.className).not.toContain('sideControls--active');
+
+    TestUtils.Simulate.click(sandwichButton);
+    
+    expect(sideControlsElem.className).toContain('sideControls--active');
+  });
 });

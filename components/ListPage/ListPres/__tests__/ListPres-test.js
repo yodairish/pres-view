@@ -22,6 +22,7 @@ describe('List Pres component', () => {
       id: 22
     }];
     
+    PresListStore.getCount.mockReturnValue(2);
     PresListStore.getAll.mockReturnValue(list);
     PresListStore.addChangeListener.mockClear();
     PresListActions.loadMore.mockClear();
@@ -41,7 +42,14 @@ describe('List Pres component', () => {
     expect(items[0].props.id).toBe(11);
   });
   
-  it('Call for new items when initialize', () => {
+  it('If no available items when initialize, call for new', () => {
+    expect(PresListActions.loadMore.mock.calls.length).toBe(0);
+    
+    PresListStore.getCount.mockReturnValue(0);
+    listPres = TestUtils.renderIntoDocument(
+      <ListPres />
+    );
+    
     expect(PresListActions.loadMore.mock.calls.length).toBe(1);
   });
   

@@ -873,16 +873,19 @@
 	});
 
 	PresViewStore.dispatchToken = appDispatcher.register(function (action) {
-	  console.log("dispatcher action", action);
-
 	  switch (action.type) {
 	    case ACTIONS_PRES_VIEW.OPEN:
 	      {
+	        var needLoad = presentationId !== action.id;
+
 	        presentationId = action.id;
+
+	        if (needLoad) {
+	          loader.getSlides(presentationId);
+	        }
+
 	        visibility = true;
 	        PresViewStore.emitVisibility();
-
-	        loader.getSlides(presentationId);
 	        keyController.startListen();
 	        break;
 	      }
@@ -905,7 +908,6 @@
 	      }
 	    case ACTIONS_PRES_VIEW.GET_SLIDES_ERROR:
 	      {
-	        // do something
 	        visibility = false;
 	        PresViewStore.emitVisibility();
 
@@ -1132,13 +1134,13 @@
 
 	var React = _interopRequire(__webpack_require__(3));
 
-	var PresListStore = _interopRequire(__webpack_require__(17));
+	var PresListStore = _interopRequire(__webpack_require__(18));
 
-	var PresListActions = _interopRequire(__webpack_require__(18));
+	var PresListActions = _interopRequire(__webpack_require__(19));
 
-	var ListPresItem = _interopRequire(__webpack_require__(19));
+	var ListPresItem = _interopRequire(__webpack_require__(20));
 
-	var LoadMore = _interopRequire(__webpack_require__(20));
+	var LoadMore = _interopRequire(__webpack_require__(21));
 
 	module.exports = React.createClass({
 	  displayName: "ListPres",
@@ -1146,7 +1148,9 @@
 	   * Set default state
 	   */
 	  getInitialState: function getInitialState() {
-	    PresListActions.loadMore();
+	    if (!PresListStore.getCount()) {
+	      PresListActions.loadMore();
+	    }
 
 	    return {
 	      items: PresListStore.getAll()
@@ -1221,11 +1225,11 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var React = _interopRequire(__webpack_require__(21));
+	var React = _interopRequire(__webpack_require__(17));
 
-	var PresListStore = _interopRequire(__webpack_require__(17));
+	var PresListStore = _interopRequire(__webpack_require__(18));
 
-	var PresListActions = _interopRequire(__webpack_require__(18));
+	var PresListActions = _interopRequire(__webpack_require__(19));
 
 	module.exports = React.createClass({
 	  displayName: "Menu",
@@ -1282,7 +1286,7 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var React = _interopRequire(__webpack_require__(21));
+	var React = _interopRequire(__webpack_require__(17));
 
 	var ProgressBar = _interopRequire(__webpack_require__(22));
 
@@ -1533,9 +1537,9 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	__webpack_require__(56);
+	__webpack_require__(55);
 
-	var PresListActions = _interopRequire(__webpack_require__(18));
+	var PresListActions = _interopRequire(__webpack_require__(19));
 
 	var ViewPresActions = _interopRequire(__webpack_require__(24));
 
@@ -1936,6 +1940,14 @@
 
 	"use strict";
 
+	module.exports = __webpack_require__(54);
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
 	var EventEmitter = __webpack_require__(16).EventEmitter;
@@ -2138,7 +2150,7 @@
 	module.exports = PresListStore;
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2204,16 +2216,16 @@
 	};
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var React = _interopRequire(__webpack_require__(21));
+	var React = _interopRequire(__webpack_require__(17));
 
-	var PresListActions = _interopRequire(__webpack_require__(18));
+	var PresListActions = _interopRequire(__webpack_require__(19));
 
 	var ViewPresActions = _interopRequire(__webpack_require__(24));
 
@@ -2293,18 +2305,18 @@
 	});
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var React = _interopRequire(__webpack_require__(21));
+	var React = _interopRequire(__webpack_require__(17));
 
-	var PresListStore = _interopRequire(__webpack_require__(17));
+	var PresListStore = _interopRequire(__webpack_require__(18));
 
-	var PresListActions = _interopRequire(__webpack_require__(18));
+	var PresListActions = _interopRequire(__webpack_require__(19));
 
 	module.exports = React.createClass({
 	  displayName: "LoadMore",
@@ -2376,14 +2388,6 @@
 	    PresListActions.loadMore();
 	  }
 	});
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	module.exports = __webpack_require__(54);
 
 /***/ },
 /* 22 */
@@ -2667,7 +2671,7 @@
 
 	var React = _interopRequire(__webpack_require__(3));
 
-	var PreviewItem = _interopRequire(__webpack_require__(55));
+	var PreviewItem = _interopRequire(__webpack_require__(56));
 
 	var PresViewStore = _interopRequire(__webpack_require__(6));
 
@@ -2741,15 +2745,15 @@
 
 	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-	var React = _interopRequire(__webpack_require__(21));
+	var React = _interopRequire(__webpack_require__(17));
 
 	var ViewPresActions = _interopRequire(__webpack_require__(24));
 
-	var PresListActions = _interopRequire(__webpack_require__(18));
+	var PresListActions = _interopRequire(__webpack_require__(19));
 
 	var PresViewStore = _interopRequire(__webpack_require__(6));
 
-	var PresListStore = _interopRequire(__webpack_require__(17));
+	var PresListStore = _interopRequire(__webpack_require__(18));
 
 	module.exports = React.createClass({
 	  displayName: "SideControls",
@@ -8758,64 +8762,6 @@
 
 	"use strict";
 
-	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-	var React = _interopRequire(__webpack_require__(21));
-
-	var ViewPresActions = _interopRequire(__webpack_require__(24));
-
-	module.exports = React.createClass({
-	  displayName: "PreviewItem",
-	  /**
-	   * Define types for props
-	   */
-	  propTypes: {
-	    img: React.PropTypes.string.isRequired,
-	    position: React.PropTypes.number.isRequired,
-	    displayed: React.PropTypes.bool
-	  },
-
-	  /**
-	   * Rendering component to html
-	   */
-	  render: function render() {
-	    var cx = React.addons.classSet,
-	        itemClasses = cx({
-	      "preview-item": true,
-	      "preview-item--displayed": this.props.displayed
-	    }),
-	        inlineImg = {
-	      backgroundImage: "url(" + this.props.img + ")"
-	    };
-
-	    return React.createElement(
-	      "div",
-	      { className: itemClasses,
-	        onClick: this.onClick },
-	      React.createElement("span", { className: "preview-img",
-	        style: inlineImg }),
-	      React.createElement(
-	        "span",
-	        { className: "preview-position" },
-	        this.props.position
-	      )
-	    );
-	  },
-
-	  /**
-	   * Open current slide
-	   */
-	  onClick: function onClick() {
-	    ViewPresActions.showSlide(this.props.position - 1);
-	  }
-	});
-
-/***/ },
-/* 56 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
 	(function () {
 	  "use strict";
 
@@ -9139,6 +9085,64 @@
 	  };
 	  self.fetch.polyfill = true;
 	})();
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+	var React = _interopRequire(__webpack_require__(17));
+
+	var ViewPresActions = _interopRequire(__webpack_require__(24));
+
+	module.exports = React.createClass({
+	  displayName: "PreviewItem",
+	  /**
+	   * Define types for props
+	   */
+	  propTypes: {
+	    img: React.PropTypes.string.isRequired,
+	    position: React.PropTypes.number.isRequired,
+	    displayed: React.PropTypes.bool
+	  },
+
+	  /**
+	   * Rendering component to html
+	   */
+	  render: function render() {
+	    var cx = React.addons.classSet,
+	        itemClasses = cx({
+	      "preview-item": true,
+	      "preview-item--displayed": this.props.displayed
+	    }),
+	        inlineImg = {
+	      backgroundImage: "url(" + this.props.img + ")"
+	    };
+
+	    return React.createElement(
+	      "div",
+	      { className: itemClasses,
+	        onClick: this.onClick },
+	      React.createElement("span", { className: "preview-img",
+	        style: inlineImg }),
+	      React.createElement(
+	        "span",
+	        { className: "preview-position" },
+	        this.props.position
+	      )
+	    );
+	  },
+
+	  /**
+	   * Open current slide
+	   */
+	  onClick: function onClick() {
+	    ViewPresActions.showSlide(this.props.position - 1);
+	  }
+	});
 
 /***/ },
 /* 57 */
@@ -12819,7 +12823,7 @@
 
 	"use strict";
 
-	var AutoFocusMixin = __webpack_require__(148);
+	var AutoFocusMixin = __webpack_require__(149);
 	var ReactBrowserComponentMixin = __webpack_require__(79);
 	var ReactCompositeComponent = __webpack_require__(31);
 	var ReactElement = __webpack_require__(34);
@@ -12887,7 +12891,7 @@
 	"use strict";
 
 	var EventConstants = __webpack_require__(61);
-	var LocalEventTrapMixin = __webpack_require__(149);
+	var LocalEventTrapMixin = __webpack_require__(148);
 	var ReactBrowserComponentMixin = __webpack_require__(79);
 	var ReactCompositeComponent = __webpack_require__(31);
 	var ReactElement = __webpack_require__(34);
@@ -12940,7 +12944,7 @@
 	"use strict";
 
 	var EventConstants = __webpack_require__(61);
-	var LocalEventTrapMixin = __webpack_require__(149);
+	var LocalEventTrapMixin = __webpack_require__(148);
 	var ReactBrowserComponentMixin = __webpack_require__(79);
 	var ReactCompositeComponent = __webpack_require__(31);
 	var ReactElement = __webpack_require__(34);
@@ -12990,7 +12994,7 @@
 
 	"use strict";
 
-	var AutoFocusMixin = __webpack_require__(148);
+	var AutoFocusMixin = __webpack_require__(149);
 	var DOMPropertyOperations = __webpack_require__(27);
 	var LinkedValueUtils = __webpack_require__(150);
 	var ReactBrowserComponentMixin = __webpack_require__(79);
@@ -13207,7 +13211,7 @@
 
 	"use strict";
 
-	var AutoFocusMixin = __webpack_require__(148);
+	var AutoFocusMixin = __webpack_require__(149);
 	var LinkedValueUtils = __webpack_require__(150);
 	var ReactBrowserComponentMixin = __webpack_require__(79);
 	var ReactCompositeComponent = __webpack_require__(31);
@@ -13386,7 +13390,7 @@
 
 	"use strict";
 
-	var AutoFocusMixin = __webpack_require__(148);
+	var AutoFocusMixin = __webpack_require__(149);
 	var DOMPropertyOperations = __webpack_require__(27);
 	var LinkedValueUtils = __webpack_require__(150);
 	var ReactBrowserComponentMixin = __webpack_require__(79);
@@ -15252,7 +15256,7 @@
 	var assign = __webpack_require__(47);
 
 	var ReactTransitionGroup = React.createFactory(__webpack_require__(118));
-	var ReactCSSTransitionGroupChild = React.createFactory(__webpack_require__(172));
+	var ReactCSSTransitionGroupChild = React.createFactory(__webpack_require__(171));
 
 	var ReactCSSTransitionGroup = React.createClass({
 	  displayName: "ReactCSSTransitionGroup",
@@ -15306,7 +15310,7 @@
 	"use strict";
 
 	var React = __webpack_require__(7);
-	var ReactTransitionChildMapping = __webpack_require__(171);
+	var ReactTransitionChildMapping = __webpack_require__(172);
 
 	var assign = __webpack_require__(47);
 	var cloneWithProps = __webpack_require__(120);
@@ -16869,7 +16873,7 @@
 
 	"use strict";
 
-	var camelize = __webpack_require__(173);
+	var camelize = __webpack_require__(174);
 
 	var msPattern = /^-ms-/;
 
@@ -16974,7 +16978,7 @@
 
 	"use strict";
 
-	var hyphenate = __webpack_require__(174);
+	var hyphenate = __webpack_require__(173);
 
 	var msPattern = /^ms-/;
 
@@ -18635,36 +18639,6 @@
 /* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule AutoFocusMixin
-	 * @typechecks static-only
-	 */
-
-	"use strict";
-
-	var focusNode = __webpack_require__(178);
-
-	var AutoFocusMixin = {
-	  componentDidMount: function () {
-	    if (this.props.autoFocus) {
-	      focusNode(this.getDOMNode());
-	    }
-	  }
-	};
-
-	module.exports = AutoFocusMixin;
-
-/***/ },
-/* 149 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/* WEBPACK VAR INJECTION */(function(process) {/**
 	 * Copyright 2014, Facebook, Inc.
 	 * All rights reserved.
@@ -18707,6 +18681,36 @@
 
 	module.exports = LocalEventTrapMixin;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
+
+/***/ },
+/* 149 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule AutoFocusMixin
+	 * @typechecks static-only
+	 */
+
+	"use strict";
+
+	var focusNode = __webpack_require__(178);
+
+	var AutoFocusMixin = {
+	  componentDidMount: function () {
+	    if (this.props.autoFocus) {
+	      focusNode(this.getDOMNode());
+	    }
+	  }
+	};
+
+	module.exports = AutoFocusMixin;
 
 /***/ },
 /* 150 */
@@ -20077,108 +20081,6 @@
 /* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @typechecks static-only
-	 * @providesModule ReactTransitionChildMapping
-	 */
-
-	"use strict";
-
-	var ReactChildren = __webpack_require__(29);
-
-	var ReactTransitionChildMapping = {
-	  /**
-	   * Given `this.props.children`, return an object mapping key to child. Just
-	   * simple syntactic sugar around ReactChildren.map().
-	   *
-	   * @param {*} children `this.props.children`
-	   * @return {object} Mapping of key to child
-	   */
-	  getChildMapping: function (children) {
-	    return ReactChildren.map(children, function (child) {
-	      return child;
-	    });
-	  },
-
-	  /**
-	   * When you're adding or removing children some may be added or removed in the
-	   * same render pass. We want to show *both* since we want to simultaneously
-	   * animate elements in and out. This function takes a previous set of keys
-	   * and a new set of keys and merges them with its best guess of the correct
-	   * ordering. In the future we may expose some of the utilities in
-	   * ReactMultiChild to make this easy, but for now React itself does not
-	   * directly have this concept of the union of prevChildren and nextChildren
-	   * so we implement it here.
-	   *
-	   * @param {object} prev prev children as returned from
-	   * `ReactTransitionChildMapping.getChildMapping()`.
-	   * @param {object} next next children as returned from
-	   * `ReactTransitionChildMapping.getChildMapping()`.
-	   * @return {object} a key set that contains all keys in `prev` and all keys
-	   * in `next` in a reasonable order.
-	   */
-	  mergeChildMappings: function (prev, next) {
-	    prev = prev || {};
-	    next = next || {};
-
-	    function getValueForKey(key) {
-	      if (next.hasOwnProperty(key)) {
-	        return next[key];
-	      } else {
-	        return prev[key];
-	      }
-	    }
-
-	    // For each key of `next`, the list of keys to insert before that key in
-	    // the combined list
-	    var nextKeysPending = {};
-
-	    var pendingKeys = [];
-	    for (var prevKey in prev) {
-	      if (next.hasOwnProperty(prevKey)) {
-	        if (pendingKeys.length) {
-	          nextKeysPending[prevKey] = pendingKeys;
-	          pendingKeys = [];
-	        }
-	      } else {
-	        pendingKeys.push(prevKey);
-	      }
-	    }
-
-	    var i;
-	    var childMapping = {};
-	    for (var nextKey in next) {
-	      if (nextKeysPending.hasOwnProperty(nextKey)) {
-	        for (i = 0; i < nextKeysPending[nextKey].length; i++) {
-	          var pendingNextKey = nextKeysPending[nextKey][i];
-	          childMapping[nextKeysPending[nextKey][i]] = getValueForKey(pendingNextKey);
-	        }
-	      }
-	      childMapping[nextKey] = getValueForKey(nextKey);
-	    }
-
-	    // Finally, add the keys which didn't appear before any key in `next`
-	    for (i = 0; i < pendingKeys.length; i++) {
-	      childMapping[pendingKeys[i]] = getValueForKey(pendingKeys[i]);
-	    }
-
-	    return childMapping;
-	  }
-	};
-
-	module.exports = ReactTransitionChildMapping;
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
 	/* WEBPACK VAR INJECTION */(function(process) {/**
 	 * Copyright 2013-2014, Facebook, Inc.
 	 * All rights reserved.
@@ -20306,10 +20208,8 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(51)))
 
 /***/ },
-/* 173 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
 
 	/**
 	 * Copyright 2013-2014, Facebook, Inc.
@@ -20319,31 +20219,98 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
-	 * @providesModule camelize
-	 * @typechecks
+	 * @typechecks static-only
+	 * @providesModule ReactTransitionChildMapping
 	 */
 
-	var _hyphenPattern = /-(.)/g;
+	"use strict";
 
-	/**
-	 * Camelcases a hyphenated string, for example:
-	 *
-	 *   > camelize('background-color')
-	 *   < "backgroundColor"
-	 *
-	 * @param {string} string
-	 * @return {string}
-	 */
-	function camelize(string) {
-	  return string.replace(_hyphenPattern, function (_, character) {
-	    return character.toUpperCase();
-	  });
-	}
+	var ReactChildren = __webpack_require__(29);
 
-	module.exports = camelize;
+	var ReactTransitionChildMapping = {
+	  /**
+	   * Given `this.props.children`, return an object mapping key to child. Just
+	   * simple syntactic sugar around ReactChildren.map().
+	   *
+	   * @param {*} children `this.props.children`
+	   * @return {object} Mapping of key to child
+	   */
+	  getChildMapping: function (children) {
+	    return ReactChildren.map(children, function (child) {
+	      return child;
+	    });
+	  },
+
+	  /**
+	   * When you're adding or removing children some may be added or removed in the
+	   * same render pass. We want to show *both* since we want to simultaneously
+	   * animate elements in and out. This function takes a previous set of keys
+	   * and a new set of keys and merges them with its best guess of the correct
+	   * ordering. In the future we may expose some of the utilities in
+	   * ReactMultiChild to make this easy, but for now React itself does not
+	   * directly have this concept of the union of prevChildren and nextChildren
+	   * so we implement it here.
+	   *
+	   * @param {object} prev prev children as returned from
+	   * `ReactTransitionChildMapping.getChildMapping()`.
+	   * @param {object} next next children as returned from
+	   * `ReactTransitionChildMapping.getChildMapping()`.
+	   * @return {object} a key set that contains all keys in `prev` and all keys
+	   * in `next` in a reasonable order.
+	   */
+	  mergeChildMappings: function (prev, next) {
+	    prev = prev || {};
+	    next = next || {};
+
+	    function getValueForKey(key) {
+	      if (next.hasOwnProperty(key)) {
+	        return next[key];
+	      } else {
+	        return prev[key];
+	      }
+	    }
+
+	    // For each key of `next`, the list of keys to insert before that key in
+	    // the combined list
+	    var nextKeysPending = {};
+
+	    var pendingKeys = [];
+	    for (var prevKey in prev) {
+	      if (next.hasOwnProperty(prevKey)) {
+	        if (pendingKeys.length) {
+	          nextKeysPending[prevKey] = pendingKeys;
+	          pendingKeys = [];
+	        }
+	      } else {
+	        pendingKeys.push(prevKey);
+	      }
+	    }
+
+	    var i;
+	    var childMapping = {};
+	    for (var nextKey in next) {
+	      if (nextKeysPending.hasOwnProperty(nextKey)) {
+	        for (i = 0; i < nextKeysPending[nextKey].length; i++) {
+	          var pendingNextKey = nextKeysPending[nextKey][i];
+	          childMapping[nextKeysPending[nextKey][i]] = getValueForKey(pendingNextKey);
+	        }
+	      }
+	      childMapping[nextKey] = getValueForKey(nextKey);
+	    }
+
+	    // Finally, add the keys which didn't appear before any key in `next`
+	    for (i = 0; i < pendingKeys.length; i++) {
+	      childMapping[pendingKeys[i]] = getValueForKey(pendingKeys[i]);
+	    }
+
+	    return childMapping;
+	  }
+	};
+
+	module.exports = ReactTransitionChildMapping;
 
 /***/ },
-/* 174 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -20379,6 +20346,43 @@
 	}
 
 	module.exports = hyphenate;
+
+/***/ },
+/* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule camelize
+	 * @typechecks
+	 */
+
+	var _hyphenPattern = /-(.)/g;
+
+	/**
+	 * Camelcases a hyphenated string, for example:
+	 *
+	 *   > camelize('background-color')
+	 *   < "backgroundColor"
+	 *
+	 * @param {string} string
+	 * @return {string}
+	 */
+	function camelize(string) {
+	  return string.replace(_hyphenPattern, function (_, character) {
+	    return character.toUpperCase();
+	  });
+	}
+
+	module.exports = camelize;
 
 /***/ },
 /* 175 */

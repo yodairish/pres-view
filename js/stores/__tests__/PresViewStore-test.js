@@ -113,6 +113,22 @@ describe('Store for view presentation', () => {
     expect(loader.getSlides.mock.calls[0][0]).toBe(id);
   });
   
+  it('Don\'t get new slides if open presentation with same id', () => {
+    var id = 5;
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.OPEN,
+      id: id
+    });
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.OPEN,
+      id: id
+    });
+    
+    expect(loader.getSlides.mock.calls.length).toBe(1);
+  });
+  
   it('Close presentation', () => {
     callback({
       type: ACTIONS_PRES_VIEW.CLOSE

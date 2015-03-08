@@ -209,15 +209,18 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
 });
 
 PresViewStore.dispatchToken = appDispatcher.register((action) => {
-  console.log('dispatcher action', action);
-  
   switch (action.type) {
     case ACTIONS_PRES_VIEW.OPEN: {
+      var needLoad = (presentationId !== action.id);
+      
       presentationId = action.id;
+      
+      if (needLoad) {
+        loader.getSlides(presentationId);
+      }
+      
       visibility = true;
       PresViewStore.emitVisibility();
-      
-      loader.getSlides(presentationId);
       keyController.startListen();
       break;
     }
@@ -237,7 +240,6 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
       break;
     }
     case ACTIONS_PRES_VIEW.GET_SLIDES_ERROR: {
-      // do something
       visibility = false;
       PresViewStore.emitVisibility();
       
