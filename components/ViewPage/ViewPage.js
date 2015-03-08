@@ -11,7 +11,8 @@ export default React.createClass({
    */
   getInitialState() {
     return {
-      fullscreen: PresViewStore.getFullscreeStatus()
+      fullscreen: PresViewStore.getFullscreeStatus(),
+      loading: PresViewStore.getLoadingStatus()
     };
   },
   
@@ -20,7 +21,8 @@ export default React.createClass({
    * Start listening updating fullscreen mode
    */
   componentDidMount() {
-    PresViewStore.addFullscreenListener(this.onFullscreen);
+    PresViewStore.addFullscreenListener(this.onUpdate);
+    PresViewStore.addLoadingListener(this.onUpdate);
   },
   
   /**
@@ -28,22 +30,33 @@ export default React.createClass({
    * Stop listening updating fullscreen mode
    */
   componentWillUnmount() {
-    PresViewStore.removeFullscreenListener(this.onFullscreen);
+    PresViewStore.removeFullscreenListener(this.onUpdate);
+    PresViewStore.removeLoadingListener(this.onUpdate);
   },
   
   /**
    * Rendering component to html
    */
   render() {
-    var sideBar = <SideBar />;
+    var presentation,
+        sideBar;
     
-    if (this.state.fullscreen) {
-      sideBar = '';
+    if (this.state.loading) {
+      presentation = (
+        <div className="spinner"></div>
+      );
+      
+    } else {
+      if (!this.state.fullscreen) {
+        sideBar = <SideBar />;
+      }
+      
+      presentation = <Pres />;
     }
     
     return (
       <div className="viewPres">
-        <Pres />
+        {presentation}
         {sideBar}
       </div>
     );
@@ -52,9 +65,10 @@ export default React.createClass({
   /**
    * Update fullscreen status
    */
-  onFullscreen() {
+  onUpdate() {
     this.setState({
-      fullscreen: PresViewStore.getFullscreeStatus()
+      fullscreen: PresViewStore.getFullscreeStatus(),
+      loading: PresViewStore.getLoadingStatus()
     });
   }
 });

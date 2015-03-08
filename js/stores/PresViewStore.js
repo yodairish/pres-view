@@ -11,6 +11,7 @@ var slides = [],
     currentSlide = 0,
     fullscreen = false,
     visibility = false,
+    loading = false,
     PresViewStore;
 
 PresViewStore = Object.assign({}, EventEmitter.prototype, {
@@ -160,6 +161,35 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
   // ========================================
   
   /**
+   * ============ LOADING EVENTS ============
+   */
+  
+  /**
+   * Call all loading callbacks
+   */
+  emitLoading() {
+    this.emit(STORES_PRES_VIEW.LOADING, loading);
+  },
+  
+  /**
+   * Add new listener for change loading status
+   * @param {function} callback
+   */
+  addLoadingListener(callback) {
+    this.on(STORES_PRES_VIEW.LOADING, callback);
+  },
+  
+  /**
+   * Remove listener from change loading status
+   * @param {function} callback
+   */
+  removeLoadingListener(callback) {
+    this.removeListener(STORES_PRES_VIEW.LOADING, callback);
+  },
+  
+  // ========================================
+  
+  /**
    * Get all slides
    * @return {array}
    */
@@ -205,6 +235,14 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
    */
   getVisibility() {
     return visibility;
+  },
+  
+  /**
+   * Get current loading new slides status
+   * @returns {boolean}
+   */
+  getLoadingStatus() {
+    return loading;
   }
 });
 
@@ -216,6 +254,8 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
       presentationId = action.id;
       
       if (needLoad) {
+        loading = true;
+        PresViewStore.emitLoading();
         loader.getSlides(presentationId);
       }
       
@@ -233,16 +273,20 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
     case ACTIONS_PRES_VIEW.GET_SLIDES: {
       slides = action.slides;
       currentSlide = 0;
+      loading = false;
       
       PresViewStore.emitSlideList();
       PresViewStore.emitCurrentSlide();
       PresViewStore.emitProgress();
+      PresViewStore.emitLoading();
       break;
     }
     case ACTIONS_PRES_VIEW.GET_SLIDES_ERROR: {
+      loading = false;
       visibility = false;
-      PresViewStore.emitVisibility();
       
+      PresViewStore.emitLoading();
+      PresViewStore.emitVisibility();
       break;
     }
     case ACTIONS_PRES_VIEW.SHOW_SLIDE: {

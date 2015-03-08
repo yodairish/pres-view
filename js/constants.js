@@ -19,7 +19,8 @@ const ACTIONS_PRES_LIST = keyMirror({
                             FULL_SCREEN: null,
                             TOGGLE_FAVORITE: null,
                             NEXT: null,
-                            PREV: null
+                            PREV: null,
+                            LOADING: null
                           }),
       STORES_PRES_LIST = keyMirror({
                             CHANGE: null

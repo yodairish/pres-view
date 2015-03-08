@@ -15,6 +15,7 @@ describe('Pres component', () => {
   
   beforeEach(() => {
     PresViewStore.getFullscreeStatus.mockReturnValue(false);
+    PresViewStore.getLoadingStatus.mockReturnValue(false);
     
     PresViewStore.addFullscreenListener.mockClear();
     
@@ -40,5 +41,22 @@ describe('Pres component', () => {
     );
     
     expect(sideBar.length).toBe(0);
+  });
+  
+  it('If loading, when show spinner', () => {
+    var spinner;
+    
+    PresViewStore.getLoadingStatus.mockReturnValue(true);
+    
+    viewPage = TestUtils.renderIntoDocument(
+      <ViewPage />
+    );
+    
+    spinner = TestUtils.scryRenderedDOMComponentsWithClass(
+      viewPage,
+      'spinner'
+    );
+    
+    expect(spinner.length).toBe(1);
   });
 });

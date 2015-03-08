@@ -13,7 +13,8 @@ describe('Store for view presentation', () => {
       progressCallback,
       currentSlideCallback,
       fullscreenCallback,
-      visibilityCallback;
+      visibilityCallback,
+      loadingCallback;
   
   beforeEach(() => {
     appDispatcher = require('../../dispatcher/appDispatcher.js');
@@ -27,16 +28,23 @@ describe('Store for view presentation', () => {
     currentSlideCallback = jest.genMockFn();
     fullscreenCallback = jest.genMockFn();
     visibilityCallback = jest.genMockFn();
+    loadingCallback = jest.genMockFn();
     
     PresViewStore.addSlideListListener(slideListCallback);
     PresViewStore.addProgressListener(progressCallback);
     PresViewStore.addCurrentSlideListener(currentSlideCallback);
     PresViewStore.addFullscreenListener(fullscreenCallback);
     PresViewStore.addVisibilityListener(visibilityCallback);
+    PresViewStore.addLoadingListener(loadingCallback);
   });
   
   afterEach(() => {
+    PresViewStore.removeSlideListListener(slideListCallback);
     PresViewStore.removeProgressListener(progressCallback);
+    PresViewStore.removeCurrentSlideListener(currentSlideCallback);
+    PresViewStore.removeFullscreenListener(fullscreenCallback);
+    PresViewStore.removeVisibilityListener(visibilityCallback);
+    PresViewStore.removeLoadingListener(loadingCallback);
   });
   
   it('Register a callback with the dispatcher', () => {
@@ -72,6 +80,7 @@ describe('Store for view presentation', () => {
     expect(currentSlideCallback.mock.calls.length).toBe(1);
     expect(PresViewStore.getCurrentSlide()).toBe(0);
     expect(progressCallback.mock.calls[0][0]).toBe(25);
+    expect(loadingCallback.mock.calls[0][0]).toBeFalsy();
   });
   
   it('Error until getting slides', () => {
@@ -80,6 +89,7 @@ describe('Store for view presentation', () => {
     });
     
     expect(PresViewStore.getVisibility()).toBeFalsy();
+    expect(loadingCallback.mock.calls[0][0]).toBeFalsy();
   });
   
   it('Show new slide', () => {
@@ -111,6 +121,7 @@ describe('Store for view presentation', () => {
     expect(PresViewStore.getId()).toBe(id);
     expect(PresViewStore.getVisibility()).toBeTruthy();
     expect(loader.getSlides.mock.calls[0][0]).toBe(id);
+    expect(loadingCallback.mock.calls[0][0]).toBeTruthy();
   });
   
   it('Don\'t get new slides if open presentation with same id', () => {
