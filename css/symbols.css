@@ -294,7 +294,7 @@
 .sandwich-close:after {
   left: 0;
 
-  background-color: var(--color-blank);
+  background-color: var(--color-lightDark);
 
   content: '';
 }
