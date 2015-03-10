@@ -48,7 +48,7 @@
     z-index: var(--zIndex-2);
     right: 40px;
     bottom: 40px;
-    transform: scale(2);
+    transform: scale(1.5);
 
     margin-right: 0;
     margin-left: 0;
@@ -71,14 +71,14 @@
   }
 
   .sideControls.sideControls--active .control-button:nth-child(1) {
-    transform: translateX(-90px) scale(2);
+    transform: translateX(-90px) scale(1.5);
   }
 
   .sideControls.sideControls--active .control-button:nth-child(2) {
-    transform: translate(-90px, -90px) scale(2);
+    transform: translate(-90px, -90px) scale(1.5);
   }
 
   .sideControls.sideControls--active .control-button:nth-child(3) {
-    transform: translateY(-90px) scale(2);
+    transform: translateY(-90px) scale(1.5);
   }
 }

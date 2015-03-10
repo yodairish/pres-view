@@ -8,6 +8,7 @@ describe('Store for presentations list', () => {
   var appDispatcher,
       PresListStore,
       loader,
+      localStore,
       callback,
       changeCallback,
       loadingCallback;
@@ -16,6 +17,7 @@ describe('Store for presentations list', () => {
     appDispatcher = require('../../dispatcher/appDispatcher.js');
     PresListStore = require('../PresListStore.js');
     loader = require('../../utils/loader.js');
+    localStore = require('../../utils/localStore.js');
     
     callback = appDispatcher.register.mock.calls[0][0];
     
@@ -51,6 +53,17 @@ describe('Store for presentations list', () => {
     expect(changeCallback.mock.calls.length).toBe(1);
     expect(loadingCallback.mock.calls[0][0]).toBeFalsy();
     expect(items.length).toBe(2);
+  });
+  
+  it('Save presentations in localStorage', () => {
+    var items = [{}, {}];
+    
+    callback({
+      type: ACTIONS_PRES_LIST.GET_NEW_ITEMS,
+      items: items
+    });
+    
+    expect(localStore.savePresentations.mock.calls[0][0]).toEqual(items);
   });
   
   it('If error until getting new items, update loading status', () => {
@@ -92,6 +105,25 @@ describe('Store for presentations list', () => {
 
     expect(loadingCallback.mock.calls[1][0]).toBeTruthy();
     expect(loader.getNextItems.mock.calls[0][0]).toBe(1);
+  });
+  
+  it('Load next 6 items from localStorage', () => {
+    var items = [{}, {}, {}, {}, {}, {},
+                 {}, {}, {}, {}];
+                 
+    localStore.getPresentations.mockReturnValue(items);
+    
+    callback({
+      type: ACTIONS_PRES_LIST.LOAD_MORE
+    });
+    
+    expect(PresListStore.getAll()).toEqual(items.slice(0, 6));
+    
+    callback({
+      type: ACTIONS_PRES_LIST.LOAD_MORE
+    });
+    
+    expect(PresListStore.getAll()).toEqual(items);
   });
   
   it('Toggle favorite status for item', () => {

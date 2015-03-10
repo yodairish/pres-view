@@ -9,6 +9,7 @@ describe('Store for view presentation', () => {
       PresViewStore,
       callback,
       loader,
+      localStore,
       slideListCallback,
       progressCallback,
       currentSlideCallback,
@@ -20,6 +21,7 @@ describe('Store for view presentation', () => {
     appDispatcher = require('../../dispatcher/appDispatcher.js');
     PresViewStore = require('../PresViewStore.js');
     loader = require('../../utils/loader.js');
+    localStore = require('../../utils/localStore.js');
     
     callback = appDispatcher.register.mock.calls[0][0];
     
@@ -83,6 +85,19 @@ describe('Store for view presentation', () => {
     expect(loadingCallback.mock.calls[0][0]).toBeFalsy();
   });
   
+  it('Save slides for presentation in localStorage', () => {
+    var slides = [{}, {}, {}, {}],
+        id = PresViewStore.getId();
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.GET_SLIDES,
+      slides: slides
+    });
+    
+    expect(localStore.saveSlides.mock.calls[0][0]).toEqual(id);
+    expect(localStore.saveSlides.mock.calls[0][1]).toEqual(slides);
+  });
+  
   it('Error until getting slides', () => {
     callback({
       type: ACTIONS_PRES_VIEW.GET_SLIDES_ERROR
@@ -138,6 +153,25 @@ describe('Store for view presentation', () => {
     });
     
     expect(loader.getSlides.mock.calls.length).toBe(1);
+  });
+  
+  it('Open presentation with cached slides into localStore', () => {
+    var id = 5,
+        slides = [{}, {}, {}, {}];
+    
+    localStore.getSlides.mockReturnValue(slides);
+    
+    callback({
+      type: ACTIONS_PRES_VIEW.OPEN,
+      id: id
+    });
+    
+    expect(localStore.getSlides.mock.calls[0][0]).toBe(id);
+    expect(slideListCallback.mock.calls.length).toBe(1);
+    expect(PresViewStore.getSlides()).toEqual(slides);
+    expect(currentSlideCallback.mock.calls.length).toBe(1);
+    expect(PresViewStore.getCurrentSlide()).toBe(0);
+    expect(progressCallback.mock.calls[0][0]).toBe(25);
   });
   
   it('Close presentation', () => {

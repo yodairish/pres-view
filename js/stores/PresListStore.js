@@ -4,6 +4,7 @@ import {EventEmitter} from 'events';
 import {ACTIONS_PRES_LIST, STORES_PRES_LIST} from '../constants.js';
 import appDispatcher from '../dispatcher/appDispatcher.js';
 import loader from '../utils/loader.js';
+import localStore from '../utils/localStore.js';
 
 var favoritesActive = false,
     loading = false,
@@ -122,9 +123,18 @@ PresListStore = Object.assign({}, EventEmitter.prototype, {
 PresListStore.dispatchToken = appDispatcher.register((action) => {
   switch (action.type) {
     case ACTIONS_PRES_LIST.LOAD_MORE: {
-      loading = true;
-      PresListStore.emitLoading();
-      loader.getNextItems(PresListStore.getCount());
+      var preses = getFromStore();
+      
+      if (preses) {
+        presentations = presentations.concat(preses);
+        PresListStore.emitChange();
+        
+      } else {
+        loading = true;
+        PresListStore.emitLoading();
+        loader.getNextItems(PresListStore.getCount());
+      }
+      
       break;
     }
     case ACTIONS_PRES_LIST.GET_NEW_ITEMS: {
@@ -134,6 +144,8 @@ PresListStore.dispatchToken = appDispatcher.register((action) => {
       
       loading = false;
       PresListStore.emitLoading();
+      
+      localStore.savePresentations(presentations);
       break;
     }
     case ACTIONS_PRES_LIST.GET_NEW_ITEMS_ERROR: {
@@ -186,6 +198,22 @@ function findItemById(id) {
   }
   
   return index;
+}
+
+/**
+ * Get presentations from local storage
+ * @returns {array?}
+ */
+function getFromStore() {
+  var count = PresListStore.getCount(),
+      storePreses = localStore.getPresentations(),
+      preses = null;
+
+  if (storePreses && storePreses.length > count) {
+    preses = storePreses.slice(count, count + 6);
+  }
+  
+  return preses;
 }
 
 export default PresListStore;

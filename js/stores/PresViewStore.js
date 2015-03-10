@@ -5,6 +5,7 @@ import {ACTIONS_PRES_VIEW, STORES_PRES_VIEW} from '../constants.js';
 import appDispatcher from '../dispatcher/appDispatcher.js';
 import loader from '../utils/loader.js';
 import keyController from '../utils/keyController.js';
+import localStore from '../utils/localStore.js';
 
 var slides = [],
     presentationId = -1,
@@ -249,19 +250,28 @@ PresViewStore = Object.assign({}, EventEmitter.prototype, {
 PresViewStore.dispatchToken = appDispatcher.register((action) => {
   switch (action.type) {
     case ACTIONS_PRES_VIEW.OPEN: {
-      var needLoad = (presentationId !== action.id);
+      var needLoad = (presentationId !== action.id),
+          savedSlides;
       
       presentationId = action.id;
       
       if (needLoad) {
-        loading = true;
-        PresViewStore.emitLoading();
-        loader.getSlides(presentationId);
+        savedSlides = localStore.getSlides(action.id);
+        
+        if (savedSlides) {
+          onGetSlides(savedSlides);
+          
+        } else {
+          loading = true;
+          PresViewStore.emitLoading();
+          loader.getSlides(presentationId);
+        }
       }
       
       visibility = true;
       PresViewStore.emitVisibility();
       keyController.startListen();
+      
       break;
     }
     case ACTIONS_PRES_VIEW.CLOSE: {
@@ -271,13 +281,10 @@ PresViewStore.dispatchToken = appDispatcher.register((action) => {
       break;
     }
     case ACTIONS_PRES_VIEW.GET_SLIDES: {
-      slides = action.slides;
-      currentSlide = 0;
-      loading = false;
+      onGetSlides(action.slides);
+      localStore.saveSlides(presentationId, action.slides);
       
-      PresViewStore.emitSlideList();
-      PresViewStore.emitCurrentSlide();
-      PresViewStore.emitProgress();
+      loading = false;
       PresViewStore.emitLoading();
       break;
     }
@@ -350,6 +357,19 @@ function calcProgress() {
   }
   
   return progress;
+}
+
+/**
+ * Processing getting new slides
+ * @param {array} newSlides
+ */
+function onGetSlides(newSlides) {
+  slides = newSlides;
+  currentSlide = 0;
+  
+  PresViewStore.emitSlideList();
+  PresViewStore.emitCurrentSlide();
+  PresViewStore.emitProgress();
 }
 
 export default PresViewStore;
