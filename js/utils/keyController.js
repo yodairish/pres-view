@@ -23,7 +23,6 @@ export default {
  */
 function processKey(e) {
   var key = e.which;
-  console.log(key);
   
   if (key === 39 || key === 32) {
     ViewPresActions.next();
